@@ -21,7 +21,8 @@ set compiler_options= /std:c17 ^
                       /Fobin\obj\  ^
                       /Zi ^
                       /W4 ^
-                      /WX 
+                      /WX ^
+                      /diagnostics:caret
                       
 set linker_options= /OUT:bin\moss.exe ^
                     /PDB:bin\moss.pdb ^
