@@ -380,7 +380,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
             0, 1, 0, 0, 1, 0,
             1, 0, 0, 0, 1, 0,
             1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 1, 1,
+            0, 0, 0, 0, 1, 0,
             0, 0, 0, 0, 1, 0,
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
