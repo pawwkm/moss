@@ -62,11 +62,9 @@ The rendering is done entirely using
 * [SDL_RenderDrawLine](https://wiki.libsdl.org/SDL_RenderDrawLine)
 
 ## Font rendering
-While UTF8 is supported the rendering is centered around whats on the 
-[Character map](character_map.txt). Do note some characters on there is
-rendered as Tofu (U+FFFD). Only left to right text is considered. Ligatures
-are not a thing in this editor. To add more glyphs from the Basic Multilingual
-Plane check out [cozette.c](src/rendering/cozette.c).
+The currently the ASCII portion of [cozette.c](src/renderer/cozette.c)
+is used for rendering text. In the case of non-ASCII characters a
+? where the colors are inverted is used.
 
 # GPU usage
 Rendering is GPU accelerated but no frames are drawn unless resizing, typing or
