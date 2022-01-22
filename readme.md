@@ -52,7 +52,7 @@ also go back to NORMAL mode by pressing `ESC`.
 * `C` Close active tab.
 
 # File encodings
-Files opened are expected to be UTF8 encoded.
+Files opened are expected to be ASCII encoded.
 
 # Rendering
 The rendering is done entirely using 
