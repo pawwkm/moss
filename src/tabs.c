@@ -329,8 +329,8 @@ bool go_to(View* const view, const Rectangle view_rectangle, const bool use_pref
         absolute_location.line = buffer->lines_length - 1;
 
     const Line* const line = &buffer->lines[absolute_location.line];
-    if (line->code_points_length < absolute_location.column)
-        absolute_location.column = line->code_points_length;
+    if (line->characters_length < absolute_location.column)
+        absolute_location.column = line->characters_length;
 
     const Vertical_Movement vertical_movement = find_vertical_movement(view, absolute_location.line);
     switch (vertical_movement)
@@ -352,7 +352,7 @@ bool go_to(View* const view, const Rectangle view_rectangle, const bool use_pref
     {
         if (vertical_movement)
         {
-            const uint16_t column = line->code_points_length < view->prefered_column ? line->code_points_length : view->prefered_column;
+            const uint16_t column = line->characters_length < view->prefered_column ? line->characters_length : view->prefered_column;
             horizontal_movement = find_horizontal_movement(view, column);
 
             switch (horizontal_movement)

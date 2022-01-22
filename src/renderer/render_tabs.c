@@ -61,9 +61,8 @@ static void render_tab_headers(const Tab* const tab, const Rectangle tab_rectang
         else
             angle_bracket_color = color;
 
-        // prepend > to the file name.
         uint16_t columns_rendered = 0;
-        render_string(&(uint32_t) { 0x3E }, 1, & columns_rendered, angle_bracket_color, header_line);
+        render_string(">", 1, & columns_rendered, angle_bracket_color, header_line);
         render_string(buffer->file_name, buffer->file_name_length, &columns_rendered, color, header_line);
 
         x_offset += (uint16_t)header_background.w;

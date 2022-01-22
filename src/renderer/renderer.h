@@ -6,8 +6,6 @@
 #include "../tabs.h"
 #include "SDL.h"
 
-#define BASIC_MULTILINGUAL_PLANE_RANGE 0xFFFF
-
 typedef enum
 {
     Font_Color_plain,
@@ -27,7 +25,7 @@ typedef struct
     uint16_t y;
 } Font_Offset;
 
-extern Font_Offset (*font_offsets)[Font_Color_selected + 1];
+extern Font_Offset font_offsets[256][Font_Color_selected + 1];
 
 extern SDL_Color foreground_colors[];
 extern SDL_Color background_colors[];
@@ -41,7 +39,7 @@ void render_tabs(void);
 void render_view(const View* view, Rectangle view_rectangle);
 void render_status_line(void);
 void render_line(const Line* line, Location offset, Location cursor, bool render_cursor, Rectangle line_rectangle);
-bool render_string(const uint32_t* code_points, uint16_t code_points_length, uint16_t* columns_rendered, Font_Color color, Rectangle line_rectangle);
+bool render_string(const char* characters, uint16_t characterss_length, uint16_t* columns_rendered, Font_Color color, Rectangle line_rectangle);
 
 void render_vertical_line(SDL_Color color, int x, int y, int height);
 

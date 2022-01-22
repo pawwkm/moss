@@ -41,15 +41,15 @@ typedef enum
 typedef struct
 {
     Token_Tag tag;
-    uint32_t* code_points;
-    uint16_t code_points_length;
+    char* characters;
+    uint16_t characters_length;
 } Token;
 
 typedef struct
 {
-    uint32_t* code_points;
-    uint16_t code_points_length;
-    uint16_t code_points_capacity;
+    char* characters;
+    uint16_t characters_length;
+    uint16_t characters_capacity;
 
     Token* tokens;
     uint16_t tokens_length;
@@ -70,8 +70,8 @@ typedef struct
 typedef enum
 {
     Change_Tag_break,
-    Change_Tag_insert_code_points,
-    Change_Tag_remove_code_points,
+    Change_Tag_insert_characters,
+    Change_Tag_remove_characters,
     Change_Tag_insert_line,
     Change_Tag_remove_line
 } Change_Tag;
@@ -80,9 +80,9 @@ typedef struct
 {
     Change_Tag tag;
     Location cursor;
-    uint32_t* code_points;
-    uint16_t code_points_length;
-    uint16_t code_points_capacity;
+    char* characters;
+    uint16_t characters_length;
+    uint16_t characters_capacity;
 } Change;
 
 typedef struct
@@ -94,7 +94,7 @@ typedef struct
     uint16_t lines_length;
     uint16_t lines_capacity;
 
-    uint32_t* file_name;
+    char* file_name;
     uint16_t file_name_length;
 
     Change* changes;
@@ -150,7 +150,7 @@ typedef struct
     uint8_t tabs_capacity;
     uint8_t active_tab_index;
 
-    uint32_t* command;
+    char* command;
     uint16_t command_length;
     uint16_t command_capacity;
     uint16_t command_cursor;

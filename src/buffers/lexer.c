@@ -4,12 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-bool compare_predefined_word(Predefined_Word* const word, const uint16_t index, const uint32_t* const restrict code_points, const uint16_t code_points_length)
+bool compare_predefined_word(Predefined_Word* const word, const uint16_t index, const char* const restrict characters, const uint16_t characters_length)
 {
-    if (!word->code_points_length || index + word->code_points_length > code_points_length)
+    if (!word->characters_length || index + word->characters_length > characters_length)
         return false;
 
-    return !memcmp(word->code_points, &code_points[index], sizeof(word->code_points[0]) * word->code_points_length);
+    return !memcmp(word->characters, &characters[index], sizeof(word->characters[0]) * word->characters_length);
 }
 
 void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment)
@@ -18,8 +18,8 @@ void lexical_analyze(Language language, Line* line, bool* continue_multiline_com
     {
         case Language_none:
             Token* token = line->tokens_length ? line->tokens : add_token(line);
-            token->code_points = line->code_points;
-            token->code_points_length = line->code_points_length;
+            token->characters = line->characters;
+            token->characters_length = line->characters_length;
             token->tag = Token_Tag_plain;
             break;
 

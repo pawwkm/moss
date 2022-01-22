@@ -24,12 +24,12 @@ void exit_insert_mode(void);
 void enter_command_mode(void);
 void exit_command_mode(void);
 
-void insert_code_point_into_command(uint32_t code_point);
+void insert_character_into_command(char character);
 
 void execute_command(void);
 void clear_command(void);
-void delete_current_code_point_in_command(void);
-void delete_previous_code_point_in_command(void);
+void delete_current_character_in_command(void);
+void delete_previous_character_in_command(void);
 
 // VISUAL mode.
 void enter_visual_mode(void);

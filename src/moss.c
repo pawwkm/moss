@@ -2,7 +2,6 @@
 #include "buffers.h"
 #include "modes.h"
 #include "renderer.h"
-#include "utf8.h"
 #include "tabs.h"
 #include "SDL.h"
 
@@ -58,7 +57,7 @@ static void handle_event(const SDL_Event* const event)
             break;
 
         case SDL_TEXTINPUT:
-            input_code_point_in_current_mode(utf8_to_code_point((uint8_t*)&event->text.text[0]));
+            input_character_in_current_mode(event->text.text[0]);
             SDL_ShowCursor(SDL_DISABLE);
             break;
 

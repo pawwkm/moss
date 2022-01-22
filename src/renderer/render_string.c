@@ -1,6 +1,6 @@
 #include "renderer.h"
 
-bool render_string(const uint32_t* const code_points, const uint16_t code_points_length, uint16_t* columns_rendered, const Font_Color color, const Rectangle line_rectangle)
+bool render_string(const char* const characters, const uint16_t characters_length, uint16_t* columns_rendered, const Font_Color color, const Rectangle line_rectangle)
 {
     SDL_Rect destination =
     {
@@ -9,12 +9,14 @@ bool render_string(const uint32_t* const code_points, const uint16_t code_points
         .h = FONT_HEIGHT
     };
 
-    for (uint16_t i = 0; i < code_points_length; i++)
+    for (uint16_t i = 0; i < characters_length; i++)
     {
-        const uint32_t code_point = code_points[i];
-        if (code_point == ' ')
+        // Avoid negative offset indices for non-ascii values.
+        const uint8_t character = characters[i];
+
+        if (character == ' ')
             (*columns_rendered)++;
-        else if (code_point == '\t')
+        else if (character == '\t')
             *columns_rendered += SPACES_PER_TAB - *columns_rendered % SPACES_PER_TAB;
         else
         {
@@ -22,7 +24,7 @@ bool render_string(const uint32_t* const code_points, const uint16_t code_points
             if (destination.x > line_rectangle.position.x + line_rectangle.width)
                 return true;
 
-            Font_Offset* offset = &font_offsets[code_point][color];
+            Font_Offset* offset = &font_offsets[character][color];
             SDL_Rect source = 
             { 
                 .x = offset->x, 

@@ -1,32 +1,32 @@
 #include "buffers.h"
 
-static bool is_owen_hex_digit(const uint32_t code_point)
+static bool is_owen_hex_digit(const uint32_t character)
 {
-    return isdigit(code_point) || 
-           code_point >= 'A' && code_point <= 'F';
+    return isdigit(character) || 
+           character >= 'A' && character <= 'F';
 }
 static bool is_owen_hex_quad(const Line* const line, const uint16_t index)
 {
-    return index + 3 <= line->code_points_length &&
-           is_owen_hex_digit(line->code_points[index]) &&
-           is_owen_hex_digit(line->code_points[index + 1]) &&
-           is_owen_hex_digit(line->code_points[index + 2]) &&
-           is_owen_hex_digit(line->code_points[index + 3]);
+    return index + 3 <= line->characters_length &&
+           is_owen_hex_digit(line->characters[index]) &&
+           is_owen_hex_digit(line->characters[index + 1]) &&
+           is_owen_hex_digit(line->characters[index + 2]) &&
+           is_owen_hex_digit(line->characters[index + 3]);
 }
 
 static bool lex_owen_character(Line* const line, uint16_t* const index, const bool is_string)
 {
-    if (*index + 1 <= line->code_points_length && line->code_points[*index] == '\\')
+    if (*index + 1 <= line->characters_length && line->characters[*index] == '\\')
     {
         (*index)++;
-        if (line->code_points[*index] == 'u' && *index + 4 <= line->code_points_length && is_owen_hex_quad(line, *index + 1))
+        if (line->characters[*index] == 'u' && *index + 4 <= line->characters_length && is_owen_hex_quad(line, *index + 1))
             *index += 4;
-        else if (line->code_points[*index] == 'U' && *index + 7 <= line->code_points_length && is_owen_hex_quad(line, *index + 1) && is_owen_hex_quad(line, *index + 4))
+        else if (line->characters[*index] == 'U' && *index + 7 <= line->characters_length && is_owen_hex_quad(line, *index + 1) && is_owen_hex_quad(line, *index + 4))
             *index += 8;
     }
-    else if (is_string && line->code_points[*index] == '"' || !is_string && line->code_points[*index] == '\'')
+    else if (is_string && line->characters[*index] == '"' || !is_string && line->characters[*index] == '\'')
         return false;
-    else if (line->code_points[*index] == '\t')
+    else if (line->characters[*index] == '\t')
         // Some characters will be invalid in literals down the line.
         return false;
 
@@ -116,91 +116,91 @@ void lexical_analyze_owen(Line* const line)
     };
 
     uint16_t index = 0;
-    while (index != line->code_points_length)
+    while (index != line->characters_length)
     {
         uint16_t start_index = index;
 
         Token* token = add_token(line);
-        token->code_points = &line->code_points[index];
+        token->characters = &line->characters[index];
 
-        if (isspace(line->code_points[index]))
+        if (isspace(line->characters[index]))
         {
-            while (index != line->code_points_length && isspace(line->code_points[index]))
+            while (index != line->characters_length && isspace(line->characters[index]))
                 index++;
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
             token->tag = Token_Tag_white_space;
         }
-        else if (index + 1 <= line->code_points_length && line->code_points[index] == '/' && line->code_points[index + 1] == '/')
+        else if (index + 1 <= line->characters_length && line->characters[index] == '/' && line->characters[index + 1] == '/')
         {
-            token->code_points_length = line->code_points_length - start_index;
+            token->characters_length = line->characters_length - start_index;
             token->tag = Token_Tag_comment;
 
             return;
         }
-        else if (line->code_points[index] == '\'')
+        else if (line->characters[index] == '\'')
         {
             index++;
-            if (index != line->code_points_length && lex_owen_character(line, &index, false))
+            if (index != line->characters_length && lex_owen_character(line, &index, false))
             {
-                if (index != line->code_points_length && line->code_points[index] == '\'')
+                if (index != line->characters_length && line->characters[index] == '\'')
                 {
                     index++;
                     token->tag = Token_Tag_string;
                 }
             }
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
         }
-        else if (line->code_points[index] == '"')
+        else if (line->characters[index] == '"')
         {
             do
                 index++;
-            while (index != line->code_points_length && line->code_points[index] != '"');
+            while (index != line->characters_length && line->characters[index] != '"');
 
-            if (index != line->code_points_length && line->code_points[index] == '"')
+            if (index != line->characters_length && line->characters[index] == '"')
                 index++;
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
             token->tag = Token_Tag_string;
         }
-        else if (ispunct(line->code_points[index]))
+        else if (ispunct(line->characters[index]))
         {
             index++;
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
         }
-        else if (islower(line->code_points[index]))
+        else if (islower(line->characters[index]))
         {
             index++;
-            while (index != line->code_points_length && (islower(line->code_points[index]) || isdigit(line->code_points[index])))
+            while (index != line->characters_length && (islower(line->characters[index]) || isdigit(line->characters[index])))
             {
                 index++;
-                if (index + 1 <= line->code_points_length && line->code_points[index] == '_' && islower(line->code_points[index + 1]))
+                if (index + 1 <= line->characters_length && line->characters[index] == '_' && islower(line->characters[index + 1]))
                     index++;
             }
 
-            if (index != line->code_points_length && (isalnum(line->code_points[index]) || line->code_points[index] == '_'))
+            if (index != line->characters_length && (isalnum(line->characters[index]) || line->characters[index] == '_'))
             {
                 // This is not a conforming identifier but to make sure that the lexer
                 // doesn't think that the following code points are we consume them now.
-                while (index != line->code_points_length && (isalnum(line->code_points[index]) || line->code_points[index] == '_'))
+                while (index != line->characters_length && (isalnum(line->characters[index]) || line->characters[index] == '_'))
                     index++;
 
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
             }
             else
             {
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
                 for (uint8_t k = 0; k < sizeof(keywords) / sizeof(keywords[0]); k++)
                 {
                     Predefined_Word* keyword = &keywords[k];
-                    if (keyword->code_points_length > token->code_points_length)
+                    if (keyword->characters_length > token->characters_length)
                         break;
 
-                    if (keyword->code_points_length != token->code_points_length)
+                    if (keyword->characters_length != token->characters_length)
                         continue;
 
-                    if (!memcmp(token->code_points, &keyword->code_points, sizeof(keyword->code_points[0]) * keyword->code_points_length))
+                    if (!memcmp(token->characters, &keyword->characters, sizeof(keyword->characters[0]) * keyword->characters_length))
                     {
                         token->tag = Token_Tag_keyword;
                         break;
@@ -208,33 +208,33 @@ void lexical_analyze_owen(Line* const line)
                 }
             }
         }
-        else if (isupper(line->code_points[index]))
+        else if (isupper(line->characters[index]))
         {
             do
             {
                 index++;
-                while (index != line->code_points_length && (islower(line->code_points[index]) || isdigit(line->code_points[index])))
+                while (index != line->characters_length && (islower(line->characters[index]) || isdigit(line->characters[index])))
                     index++;
 
-                if (index + 1 <= line->code_points_length && line->code_points[index] == '_' && isupper(line->code_points[index + 1]))
+                if (index + 1 <= line->characters_length && line->characters[index] == '_' && isupper(line->characters[index + 1]))
                     index++;
                 else
                     break;
 
-            } while (isupper(line->code_points[index]));
+            } while (isupper(line->characters[index]));
 
-            if (index != line->code_points_length && (isalnum(line->code_points[index]) || line->code_points[index] == '_'))
+            if (index != line->characters_length && (isalnum(line->characters[index]) || line->characters[index] == '_'))
             {
                 // This is not a conforming identifier but to make sure that the lexer
                 // doesn't think that the following code points are we consume them now.
-                while (index != line->code_points_length && (isalnum(line->code_points[index]) || line->code_points[index] == '_'))
+                while (index != line->characters_length && (isalnum(line->characters[index]) || line->characters[index] == '_'))
                     index++;
 
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
             }
             else
             {
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
                 token->tag = Token_Tag_type;
 
                 // Check if this really is a type.
@@ -247,8 +247,8 @@ void lexical_analyze_owen(Line* const line)
                     if (previous_token->tag != Token_Tag_keyword)
                         break;
 
-                    if (compare_predefined_word(&keywords[1], 0, previous_token->code_points, previous_token->code_points_length) ||
-                        compare_predefined_word(&keywords[21], 0, previous_token->code_points, previous_token->code_points_length))
+                    if (compare_predefined_word(&keywords[1], 0, previous_token->characters, previous_token->characters_length) ||
+                        compare_predefined_word(&keywords[21], 0, previous_token->characters, previous_token->characters_length))
                         token->tag = Token_Tag_plain;
 
                     break;
@@ -258,10 +258,10 @@ void lexical_analyze_owen(Line* const line)
         else
         {
             // Pretend that there is only 127 characters.
-            while (index != line->code_points_length && !isspace(line->code_points[index]) && !ispunct(line->code_points[index]))
+            while (index != line->characters_length && !isspace(line->characters[index]) && !ispunct(line->characters[index]))
                 index++;
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
         }
     }
 }

@@ -67,7 +67,7 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
     }
 
     size_t file_length;
-    uint32_t* const file = read_file(path, &file_length);
+    char* const file = read_file(path, &file_length);
     if (!file)
         return false;
 
@@ -103,10 +103,8 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
         }
     }
 
-    size_t file_name_length = 0;
-    buffer->file_name = utf8_string_to_code_points((uint8_t*)&path[start_of_file_index], path_length - start_of_file_index, &file_name_length);
-
-    buffer->file_name_length = (uint16_t)file_name_length;
+    buffer->file_name = &path[start_of_file_index];
+    buffer->file_name_length = path_length - start_of_file_index;
 
     switch (path_length - start_of_extension)
     {
@@ -133,14 +131,14 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
     {
         if (file_index + 2 <= file_length && file[file_index] == '\r' && file[file_index + 1] == '\n' || file[file_index] == '\n')
         {
-            line->code_points_length = (uint16_t)(file_index - line_start_index);
-            if (line->code_points_length)
+            line->characters_length = (uint16_t)(file_index - line_start_index);
+            if (line->characters_length)
             {
-                while (line->code_points_capacity < line->code_points_length)
-                    line->code_points_capacity = line->code_points_capacity ? line->code_points_capacity * 2 : 4;
+                while (line->characters_capacity < line->characters_length)
+                    line->characters_capacity = line->characters_capacity ? line->characters_capacity * 2 : 4;
 
-                line->code_points = malloc(sizeof(file[0]) * line->code_points_capacity);
-                memcpy(line->code_points, &file[line_start_index], sizeof(line->code_points[0]) * line->code_points_length);
+                line->characters = malloc(sizeof(file[0]) * line->characters_capacity);
+                memcpy(line->characters, &file[line_start_index], sizeof(line->characters[0]) * line->characters_length);
             }
 
             if (file[file_index] == '\r')
@@ -157,14 +155,14 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
 
     if (file_index != line_start_index)
     {
-        line->code_points_length = (uint16_t)(file_index - line_start_index);
-        if (line->code_points_length)
+        line->characters_length = (uint16_t)(file_index - line_start_index);
+        if (line->characters_length)
         {
-            while (line->code_points_capacity < line->code_points_length)
-                line->code_points_capacity = line->code_points_capacity ? line->code_points_capacity * 2 : 4;
+            while (line->characters_capacity < line->characters_length)
+                line->characters_capacity = line->characters_capacity ? line->characters_capacity * 2 : 4;
 
-            line->code_points = malloc(sizeof(file[0]) * line->code_points_capacity);
-            memcpy(line->code_points, &file[line_start_index], sizeof(line->code_points[0]) * line->code_points_length);
+            line->characters = malloc(sizeof(file[0]) * line->characters_capacity);
+            memcpy(line->characters, &file[line_start_index], sizeof(line->characters[0]) * line->characters_length);
         }
     }
 
@@ -195,7 +193,7 @@ void close_buffer(Buffer_Handle handle)
         {
             Line* const line = &buffer->lines[i];
             free(line->tokens);
-            free(line->code_points);
+            free(line->characters);
         }
 
         memset(buffer, 0, sizeof(*buffer));
@@ -212,18 +210,10 @@ void flush_buffer(Buffer_Handle handle)
     for (uint16_t l = 0; l < buffer->lines_length; l++)
     {
         if (l)
-            SDL_RWwrite(file, &(char){'\n'}, 1, 1);
+            SDL_RWwrite(file, &"\n", 1, 1);
 
         const Line* const line = &buffer->lines[l];
-        for (uint16_t c = 0; c < line->code_points_length; c++)
-        {
-            char utf8[4] = { 0 };
-            uint8_t sequence_length;
-
-            code_point_to_utf8(line->code_points[c], &utf8, &sequence_length);
-
-            SDL_RWwrite(file, utf8, 1, sequence_length);
-        }
+        SDL_RWwrite(file, line->characters, 1, line->characters_length);
     }
 
     SDL_RWclose(file);

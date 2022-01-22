@@ -6,29 +6,20 @@
 
 typedef struct
 {
-    uint16_t code_point;
+    char character;
     bool bits[FONT_WIDTH * FONT_HEIGHT];
-} Monochrome_Bitmap_Code_Point;
+} Monochrome_Character;
 
-// Based on [Cozette code_point map](https://github.com/slavfox/Cozette/blob/ea2ec2bf26f6d68ec49a5608f994c56f592abd3b/img/charmap.png)
-// Changes:
-//     I added U+FFFD which is just U+003F with the pixels inverted.
-//     Removed anything that does not fit in 6*13 pixels
-//    Dashed box drawing characters are removed
-//
-// Blocks:
-//     Basic Latin        (U+0000..U+007F)
-//     Latin-1 Supplement (U+0080..U+00FF) (169, 174 did not fit. 175 got shaved 1 pixel)
-//     Box Drawing        (U+2500..U+257F) (U+2500, U+2501 got shaved) (U+254C, U+254D where remade)
+// This is the ASCII part of the [Cozette code_point map](https://github.com/slavfox/Cozette/blob/ea2ec2bf26f6d68ec49a5608f994c56f592abd3b/img/charmap.png)
 //
 // It is assumed that code points are sorted in ascending order.
 // The font is expected to have Tofu defined.
-#define CODE_POINT_COUNT 267
-#define MONOCRHOME_TOFU_INDEX (CODE_POINT_COUNT - 1)
-static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
+#define PRINTABLE_CHARACTER_COUNT 95
+#define MONOCRHOME_TOFU_INDEX (PRINTABLE_CHARACTER_COUNT - 1)
+static Monochrome_Character monochrome_font[PRINTABLE_CHARACTER_COUNT + 1] =
 {
     {
-        L'!',
+        '!',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -46,7 +37,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'"',
+        '"',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 0, 1, 0, 0,
@@ -64,7 +55,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'#',
+        '#',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -82,7 +73,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'$',
+        '$',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 1, 0, 0, 0,
@@ -100,7 +91,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'%',
+        '%',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 0, 0, 0, 0,
@@ -118,7 +109,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'&',
+        '&',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 1, 0, 0, 0,
@@ -136,7 +127,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'\'',
+        '\'',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 1, 0, 0, 0,
@@ -154,7 +145,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'(',
+        '(',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 1, 0, 0,
@@ -172,7 +163,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L')',
+        ')',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 0, 0, 0, 0,
@@ -190,7 +181,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'*',
+        '*',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -208,7 +199,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'+',
+        '+',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -226,7 +217,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L',',
+        ',',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -244,7 +235,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'-',
+        '-',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -262,7 +253,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'.',
+        '.',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -280,7 +271,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'/',
+        '/',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 1, 0,
@@ -298,7 +289,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'0',
+        '0',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -316,7 +307,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'1',
+        '1',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -334,7 +325,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'2',
+        '2',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -352,7 +343,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'3',
+        '3',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -370,7 +361,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'4',
+        '4',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -388,7 +379,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'5',
+        '5',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -406,7 +397,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'6',
+        '6',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -424,7 +415,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'7',
+        '7',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -442,7 +433,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'8',
+        '8',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -460,7 +451,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'9',
+        '9',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -478,7 +469,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L':',
+        ':',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -496,7 +487,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L';',
+        ';',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -514,7 +505,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'<',
+        '<',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -532,7 +523,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'=',
+        '=',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -550,7 +541,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'>',
+        '>',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -568,7 +559,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'?',
+        '?',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -586,7 +577,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'@',
+        '@',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -604,7 +595,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'A',
+        'A',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -622,7 +613,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'B',
+        'B',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -640,7 +631,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'C',
+        'C',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -658,7 +649,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'D',
+        'D',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -676,7 +667,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'E',
+        'E',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -694,7 +685,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'F',
+        'F',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -712,7 +703,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'G',
+        'G',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -730,7 +721,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'H',
+        'H',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -748,7 +739,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'I',
+        'I',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -766,7 +757,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'J',
+        'J',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -784,7 +775,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'K',
+        'K',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -802,7 +793,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'L',
+        'L',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -820,7 +811,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'M',
+        'M',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -838,7 +829,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'N',
+        'N',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -856,7 +847,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'O',
+        'O',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -874,7 +865,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'P',
+        'P',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -892,7 +883,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'Q',
+        'Q',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -910,7 +901,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'R',
+        'R',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -928,7 +919,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'S',
+        'S',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -946,7 +937,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'T',
+        'T',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -964,7 +955,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'U',
+        'U',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -982,7 +973,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'V',
+        'V',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1000,7 +991,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'W',
+        'W',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1018,7 +1009,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'X',
+        'X',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1036,7 +1027,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'Y',
+        'Y',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1054,7 +1045,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'Z',
+        'Z',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1072,7 +1063,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'[',
+        '[',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 1, 1, 0, 0,
@@ -1090,7 +1081,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'\\',
+        '\\',
         {
             0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0,
@@ -1108,7 +1099,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L']',
+        ']',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 1, 1, 0, 0,
@@ -1126,7 +1117,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'^',
+        '^',
         {
             0, 0, 1, 0, 0, 0,
             0, 1, 0, 1, 0, 0,
@@ -1144,7 +1135,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'_',
+        '_',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1162,7 +1153,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'`',
+        '`',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 0, 0, 0, 0,
@@ -1180,7 +1171,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'a',
+        'a',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1198,7 +1189,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'b',
+        'b',
         {
             0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0,
@@ -1216,7 +1207,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'c',
+        'c',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1234,7 +1225,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'd',
+        'd',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 1, 0,
@@ -1252,7 +1243,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'e',
+        'e',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1270,7 +1261,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'f',
+        'f',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 1, 1, 1, 0,
@@ -1288,7 +1279,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'g',
+        'g',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1306,7 +1297,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'h',
+        'h',
         {
             0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0,
@@ -1324,7 +1315,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'i',
+        'i',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1342,7 +1333,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'j',
+        'j',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1360,7 +1351,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'k',
+        'k',
         {
             0, 0, 0, 0, 0, 0,
             1, 0, 0, 0, 0, 0,
@@ -1378,7 +1369,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'l',
+        'l',
         {
             0, 0, 0, 0, 0, 0,
             0, 1, 1, 0, 0, 0,
@@ -1396,7 +1387,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'm',
+        'm',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1414,7 +1405,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'n',
+        'n',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1432,7 +1423,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'o',
+        'o',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1450,7 +1441,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'p',
+        'p',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1468,7 +1459,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'q',
+        'q',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1486,7 +1477,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'r',
+        'r',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1504,7 +1495,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L's',
+        's',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1522,7 +1513,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L't',
+        't',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1540,7 +1531,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'u',
+        'u',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1558,7 +1549,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'v',
+        'v',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1576,7 +1567,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'w',
+        'w',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1594,7 +1585,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'x',
+        'x',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1612,7 +1603,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'y',
+        'y',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1630,7 +1621,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'z',
+        'z',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1648,7 +1639,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'{',
+        '{',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 1, 1, 0,
@@ -1666,7 +1657,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'|',
+        '|',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 1, 0, 0, 0,
@@ -1684,7 +1675,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'}',
+        '}',
         {
             0, 0, 0, 0, 0, 0,
             1, 1, 0, 0, 0, 0,
@@ -1702,7 +1693,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'~',
+        '~',
         {
             0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0,
@@ -1720,3103 +1711,7 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
         }
     },
     {
-        L'¡',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¢',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'£',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 0, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¤',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¥',
-        {
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¦',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'§',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¨',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ª',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 0, 1, 1, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 0, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'«',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¬',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'­',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¯',
-        {
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'°',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'±',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'²',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'³',
-        {
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'´',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'µ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¶',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 1, 1, 0, 1, 0,
-            1, 1, 1, 0, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'·',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¸',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¹',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'º',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'»',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¼',
-        {
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 1, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 1, 1, 1, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'½',
-        {
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 0, 1, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¾',
-        {
-            0, 0, 0, 0, 0, 0,
-            1, 1, 0, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 0, 1, 1, 0,
-            1, 0, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'¿',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'À',
-        {
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Á',
-        {
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Â',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ã',
-        {
-            0, 1, 1, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ä',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Å',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Æ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 1, 1, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ç',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'È',
-        {
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'É',
-        {
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ê',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ë',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ì',
-        {
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Í',
-        {
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Î',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ï',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ð',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            1, 1, 1, 0, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ñ',
-        {
-            0, 1, 1, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 0, 0, 1, 0,
-            1, 1, 0, 0, 1, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ò',
-        {
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ó',
-        {
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ô',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Õ',
-        {
-            0, 1, 1, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ö',
-        {
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'×',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ø',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 1, 0, 0, 1, 0,
-            1, 1, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ù',
-        {
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ú',
-        {
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Û',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ü',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Ý',
-        {
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'Þ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ß',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'à',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'á',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'â',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ã',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ä',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'å',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 1, 1, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'æ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 0, 1, 1, 1, 0,
-            1, 0, 1, 0, 0, 0,
-            1, 0, 1, 0, 1, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ç',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'è',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'é',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ê',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ë',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ì',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'í',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'î',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ï',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ð',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 1, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 1, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ñ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ò',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ó',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ô',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'õ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 0, 1, 0,
-            1, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ö',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'÷',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ø',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 1, 1, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 0, 1, 0, 1, 0,
-            1, 1, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ù',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ú',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'û',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ü',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ý',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'þ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'ÿ',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            1, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 1, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 0, 0, 0, 1, 0,
-            0, 1, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'─',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'━',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'│',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┃',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┌',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┍',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┎',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┏',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┐',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┑',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┒',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┓',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'└',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┕',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┖',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┗',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┘',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┙',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┚',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┛',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'├',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┝',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┞',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┟',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┠',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┡',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┢',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┣',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┤',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┥',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┦',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┧',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┨',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┩',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┪',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┫',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┬',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┭',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┮',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┯',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┰',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┱',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┲',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┳',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'┴',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┵',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┶',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┷',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┸',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┹',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┺',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┻',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'┼',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┽',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┾',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'┿',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╀',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╁',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╂',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╃',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╄',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╅',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╆',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╇',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╈',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╉',
-        {
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╊',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╋',
-        {
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'╌',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 0, 0, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'╍',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 0, 0, 1, 1,
-            1, 1, 0, 0, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'╎',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╏',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-            0, 0, 1, 1, 0, 0,
-        }
-    },
-    {
-        L'═',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        }
-    },
-    {
-        L'║',
-        {
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-        }
-    },
-    {
-        L'╒',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 1, 1, 1,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╓',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 1,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-        }
-    },
-    {
-        L'╔',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 1,
-            0, 1, 0, 0, 0, 0,
-            0, 1, 0, 1, 1, 1,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-        }
-    },
-    {
-        L'╕',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            1, 1, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-            0, 0, 1, 0, 0, 0,
-        }
-    },
-    {
-        L'╖',
-        {
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-            0, 1, 0, 1, 0, 0,
-        }
-    },
-    {
-        L'�',
+        0,
         {
             1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1,
@@ -4835,36 +1730,29 @@ static Monochrome_Bitmap_Code_Point monochrome_font[CODE_POINT_COUNT] =
     }
 };
 
-// Different code points on the X axis and each colorway on the Y axis. Like this:
+// Different characters on the X axis and each colorway on the Y axis. Like this:
 // AAAAAA
 // BBBBBB
 // CCCCCC
 
 SDL_Texture* font_texture;
-Font_Offset (*font_offsets)[Font_Color_selected + 1];
+Font_Offset font_offsets[256][Font_Color_selected + 1];
 
-// Originally I hadd a loop for looking up the each code point's
+// Originally I had a loop for looking up the each code point's
 // offset when needed. It was also where most of the time was spent.
 // At the cost of more memory usage (1.83MB if my math is on point)
-// code point lookups where reduced to font_offsets[code_point][color]
+// code point lookups where reduced to font_offsets[character][color]
 
 static void place_texture_offsets(void)
 {
-    font_offsets = malloc(BASIC_MULTILINGUAL_PLANE_RANGE * sizeof(font_offsets[0]));
-    if (!font_offsets)
-    {
-        SDL_Log("Could not malloc font_offsets.\n");
-        return;
-    }
-
     uint16_t offset_index = 0;
-    uint16_t known_code_point_index = 0;
+    uint16_t known_character_index = 0;
 
     while (true)
     {
         uint16_t texture_line;
-        if (known_code_point_index < CODE_POINT_COUNT && monochrome_font[known_code_point_index].code_point == offset_index)
-            texture_line = known_code_point_index++;
+        if (known_character_index < PRINTABLE_CHARACTER_COUNT && monochrome_font[known_character_index].character == offset_index)
+            texture_line = known_character_index++;
         else
             texture_line = MONOCRHOME_TOFU_INDEX;
 
@@ -4876,24 +1764,26 @@ static void place_texture_offsets(void)
                 .y = y_offset,
                 .x = (uint16_t)color * FONT_WIDTH
             };
+
+            SDL_Log("index:%u Color:%u %u:%u.\n", offset_index, color, font_offsets[offset_index][color].x, font_offsets[offset_index][color].y);
         }
 
-        if (offset_index == BASIC_MULTILINGUAL_PLANE_RANGE)
+        if (offset_index == UINT8_MAX)
             break;
 
         offset_index++;
     }
 }
 
-static void render_known_code_points_to_texture(void)
+static void render_known_characters_to_texture(void)
 {
-    SDL_Surface* const surface = SDL_CreateRGBSurface(0, FONT_WIDTH * (Font_Color_selected + 1), FONT_HEIGHT * CODE_POINT_COUNT, 32, 0, 0, 0, 0);
+    SDL_Surface* const surface = SDL_CreateRGBSurface(0, FONT_WIDTH * (Font_Color_selected + 1), FONT_HEIGHT * PRINTABLE_CHARACTER_COUNT, 32, 0, 0, 0, 0);
     if (!surface)
         SDL_Log("Could not create surface: %s\n", SDL_GetError());
 
-    for (uint16_t c = 0; c < CODE_POINT_COUNT; c++)
+    for (uint8_t c = 0; c < PRINTABLE_CHARACTER_COUNT; c++)
     {
-        const Monochrome_Bitmap_Code_Point* const monochrome_code_point = &monochrome_font[c];
+        const Monochrome_Character* const monochrome_character = &monochrome_font[c];
 
         for (uint8_t h = 0; h < FONT_HEIGHT; h++)
         {
@@ -4901,9 +1791,9 @@ static void render_known_code_points_to_texture(void)
             {
                 for (Font_Color color = Font_Color_plain; color < Font_Color_selected + 1; color++)
                 {
-                    Font_Offset* const offset = &font_offsets[monochrome_code_point->code_point][color];
+                    Font_Offset* const offset = &font_offsets[monochrome_character->character][color];
 
-                    const SDL_Color* const pixel_color = monochrome_code_point->bits[h * FONT_WIDTH + w] ? &foreground_colors[color] : &background_colors[color];
+                    const SDL_Color* const pixel_color = monochrome_character->bits[h * FONT_WIDTH + w] ? &foreground_colors[color] : &background_colors[color];
                     const uint32_t source_pixel = SDL_MapRGBA(surface->format, pixel_color->r, pixel_color->g, pixel_color->b, pixel_color->a);
                     uint32_t* const destination_pixel = (uint32_t*)((uint8_t*)surface->pixels + (h + offset->y) * surface->pitch + (w + offset->x) * surface->format->BytesPerPixel);
 
@@ -4912,7 +1802,6 @@ static void render_known_code_points_to_texture(void)
             }
         }
     }
-
 
 #ifndef NDEBUG
     SDL_SaveBMP(surface, "character_map.bmp");
@@ -4928,7 +1817,7 @@ static void render_known_code_points_to_texture(void)
 void initialize_font(void)
 {
     place_texture_offsets();
-    render_known_code_points_to_texture();
+    render_known_characters_to_texture();
 }
 
 void uninitialize_font(void)

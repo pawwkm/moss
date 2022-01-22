@@ -5,24 +5,24 @@
 
 static void c_multiline(Line* line, Token* token, uint16_t* index, const uint16_t start_index, bool* const continue_multiline_comment)
 {
-    while (*index != line->code_points_length)
+    while (*index != line->characters_length)
     {
-        if (*index + 1 <= line->code_points_length && line->code_points[*index] == '*' && line->code_points[*index + 1] == '/')
+        if (*index + 1 <= line->characters_length && line->characters[*index] == '*' && line->characters[*index + 1] == '/')
             break;
 
         (*index)++;
     }
 
     token->tag = Token_Tag_comment;
-    if (*index + 1 <= line->code_points_length && line->code_points[*index] == '*' && line->code_points[*index + 1] == '/')
+    if (*index + 1 <= line->characters_length && line->characters[*index] == '*' && line->characters[*index + 1] == '/')
     {
         *index += 2;
-        token->code_points_length = *index - start_index;
+        token->characters_length = *index - start_index;
         *continue_multiline_comment = false;
     }
     else
     {
-        token->code_points_length = line->code_points_length - start_index;
+        token->characters_length = line->characters_length - start_index;
         *continue_multiline_comment = true;
 
         return;
@@ -31,19 +31,19 @@ static void c_multiline(Line* line, Token* token, uint16_t* index, const uint16_
 
 static bool is_c_hex_quad(const Line* const line, uint16_t index)
 {
-    return index + 3 <= line->code_points_length  &&
-           isxdigit(line->code_points[index])     &&
-           isxdigit(line->code_points[index + 1]) &&
-           isxdigit(line->code_points[index + 2]) &&
-           isxdigit(line->code_points[index + 3]);
+    return index + 3 <= line->characters_length  &&
+           isxdigit(line->characters[index])     &&
+           isxdigit(line->characters[index + 1]) &&
+           isxdigit(line->characters[index + 2]) &&
+           isxdigit(line->characters[index + 3]);
 }
 
 // true if the next code point(s) is a valid or forms a valid escape sequence.
 static bool lex_c_character(Line* line, uint16_t* index, bool is_string)
 {
-    if (*index + 1 <= line->code_points_length && line->code_points[*index] == '\\')
+    if (*index + 1 <= line->characters_length && line->characters[*index] == '\\')
     {
-        switch (line->code_points[++(*index)])
+        switch (line->characters[++(*index)])
         {
             case '"':
                 if (is_string) 
@@ -84,20 +84,20 @@ static bool lex_c_character(Line* line, uint16_t* index, bool is_string)
             case '5':
             case '6':
             case '7':
-                if (*index != line->code_points_length && line->code_points[*index] >= '0' && line->code_points[*index] <= '7')
+                if (*index != line->characters_length && line->characters[*index] >= '0' && line->characters[*index] <= '7')
                     (*index)++;
 
-                if (*index != line->code_points_length && line->code_points[*index] >= '0' && line->code_points[*index] <= '7')
+                if (*index != line->characters_length && line->characters[*index] >= '0' && line->characters[*index] <= '7')
                     (*index)++;
 
                 return true;
 
             case 'x':
                 (*index)++;
-                if (*index != line->code_points_length && isxdigit(line->code_points[*index]))
+                if (*index != line->characters_length && isxdigit(line->characters[*index]))
                 {
                     (*index)++;
-                    while (*index != line->code_points_length && isxdigit(line->code_points[*index]))
+                    while (*index != line->characters_length && isxdigit(line->characters[*index]))
                         (*index)++;
 
                     return true;
@@ -127,7 +127,7 @@ static bool lex_c_character(Line* line, uint16_t* index, bool is_string)
                 return false;
         }
     }
-    else if (*index != line->code_points_length)
+    else if (*index != line->characters_length)
     {
         (*index)++;
         return true;
@@ -151,7 +151,7 @@ static bool last_token_is_preceeded_by_pound_sign(const Line* const line)
         if (token->tag == Token_Tag_white_space)
             continue;
         else
-            return token->code_points_length == 1 && token->code_points[0] == '#';
+            return token->characters_length == 1 && token->characters[0] == '#';
     }
 
     return false;
@@ -307,17 +307,17 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
     };
 
     uint16_t index = 0;
-    if (index == line->code_points_length && *continue_multiline_comment)
+    if (index == line->characters_length && *continue_multiline_comment)
         // This is an empty line inside of a multiline comment.
         // Return now to keep *continue_multiline_comment == true.
         return;
 
-    while (index != line->code_points_length)
+    while (index != line->characters_length)
     {
         const uint16_t start_index = index;
 
         Token* const token = add_token(line);
-        token->code_points = &line->code_points[index];
+        token->characters = &line->characters[index];
         
         if (*continue_multiline_comment)
         {
@@ -325,22 +325,22 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
             if (*continue_multiline_comment)
                 return;
         }
-        else if (isspace(line->code_points[index]))
+        else if (isspace(line->characters[index]))
         {
-            while (index != line->code_points_length && isspace(line->code_points[index]))
+            while (index != line->characters_length && isspace(line->characters[index]))
                 index++;
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
             token->tag = Token_Tag_white_space;
         }
-        else if (index + 1 != line->code_points_length && line->code_points[index] == '/' && line->code_points[index + 1] == '/')
+        else if (index + 1 != line->characters_length && line->characters[index] == '/' && line->characters[index + 1] == '/')
         {
-            token->code_points_length = line->code_points_length - start_index;
+            token->characters_length = line->characters_length - start_index;
             token->tag = Token_Tag_comment;
 
             break;
         }
-        else if (index + 1 <= line->code_points_length && line->code_points[index] == '/' && line->code_points[index + 1] == '*')
+        else if (index + 1 <= line->characters_length && line->characters[index] == '/' && line->characters[index + 1] == '*')
         {
             index++;
             
@@ -348,80 +348,80 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
             if (*continue_multiline_comment)
                 return;
         }
-        else if (line->code_points[index] == '"' || index + 1 <= line->code_points_length && line->code_points[index] == 'L' && line->code_points[index + 1] == '"')
+        else if (line->characters[index] == '"' || index + 1 <= line->characters_length && line->characters[index] == 'L' && line->characters[index + 1] == '"')
         {
-            if (line->code_points[index] == 'L')
+            if (line->characters[index] == 'L')
                 index += 2;
             else
                 index++;
 
-            while (index != line->code_points_length && line->code_points[index] != '"')
+            while (index != line->characters_length && line->characters[index] != '"')
             {
                 if (!lex_c_character(line, &index, true))
                     break;
             }
 
-            if (index != line->code_points_length && line->code_points[index] == '"')
+            if (index != line->characters_length && line->characters[index] == '"')
             {
                 index++;
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
                 token->tag = Token_Tag_string;
             }
             else
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
         }
-        else if (line->code_points[index] == '\'' || index + 1 <= line->code_points_length && line->code_points[index] == 'L' && line->code_points[index + 1] == '\'')
+        else if (line->characters[index] == '\'' || index + 1 <= line->characters_length && line->characters[index] == 'L' && line->characters[index + 1] == '\'')
         {
-            if (line->code_points[index] == 'L')
+            if (line->characters[index] == 'L')
                 index += 2;
             else
                 index++;
 
-            if (index != line->code_points_length && line->code_points[index] == '\'')
+            if (index != line->characters_length && line->characters[index] == '\'')
             {
                 index++;
-                token->code_points_length = index - start_index;
+                token->characters_length = index - start_index;
             }
             else
             {
-                while (index != line->code_points_length && line->code_points[index] != '\'')
+                while (index != line->characters_length && line->characters[index] != '\'')
                 {
                     if (!lex_c_character(line, &index, false))
                         break;
                 }
 
-                if (index != line->code_points_length && line->code_points[index] == '\'')
+                if (index != line->characters_length && line->characters[index] == '\'')
                 {
                     index++;
-                    token->code_points_length = index - start_index;
+                    token->characters_length = index - start_index;
                     token->tag = Token_Tag_string;
                 }
                 else
-                    token->code_points_length = index - start_index;
+                    token->characters_length = index - start_index;
             }
         }
-        else if (ispunct(line->code_points[index]))
+        else if (ispunct(line->characters[index]))
         {
             index++;
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
         }
-        else if (isalpha(line->code_points[index]))
+        else if (isalpha(line->characters[index]))
         {
             do
                 index++;
-            while (index != line->code_points_length && (isalnum(line->code_points[index]) || line->code_points[index] == '_'));
+            while (index != line->characters_length && (isalnum(line->characters[index]) || line->characters[index] == '_'));
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
             for (uint8_t k = 0; k < sizeof(keywords) / sizeof(keywords[0]); k++)
             {
                 Predefined_Word* const keyword = &keywords[k];
-                if (keyword->code_points_length > token->code_points_length)
+                if (keyword->characters_length > token->characters_length)
                     break;
 
-                if (keyword->code_points_length != token->code_points_length)
+                if (keyword->characters_length != token->characters_length)
                     continue;
 
-                if (!memcmp(token->code_points, &keyword->code_points, sizeof(keyword->code_points[0]) * keyword->code_points_length))
+                if (!memcmp(token->characters, &keyword->characters, sizeof(keyword->characters[0]) * keyword->characters_length))
                 {
                     if (k != 0 || !last_token_is_preceeded_by_pound_sign(line))
                         token->tag = Token_Tag_keyword;
@@ -434,7 +434,7 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
                 continue;
 
             // If the identifier ends with _t it is probably a type.
-            if (token->code_points_length >= 2 && line->code_points[index - 2] == '_' && line->code_points[index - 1] == 't')
+            if (token->characters_length >= 2 && line->characters[index - 2] == '_' && line->characters[index - 1] == 't')
             {
                 token->tag = Token_Tag_type;
                 continue;
@@ -443,13 +443,13 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
             for (uint16_t t = 0; t < predefined_c_types_length; t++)
             {
                 Predefined_Type* type = &predefined_c_types[t];
-                if (type->code_points_length > token->code_points_length)
+                if (type->characters_length > token->characters_length)
                     break;
 
-                if (type->code_points_length != token->code_points_length)
+                if (type->characters_length != token->characters_length)
                     continue;
 
-                if (!memcmp(token->code_points, type->code_points, sizeof(type->code_points[0]) * type->code_points_length))
+                if (!memcmp(token->characters, type->characters, sizeof(type->characters[0]) * type->characters_length))
                 {
                     token->tag = Token_Tag_type;
                     break;
@@ -460,32 +460,32 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
                 continue;
 
             // Owen style types.
-            if (isupper(token->code_points[0]))
+            if (isupper(token->characters[0]))
             {
                 uint16_t i = 0;
                 do
                 {
                     i++;
-                    while (i != token->code_points_length && (islower(token->code_points[i]) || isdigit(token->code_points[i])))
+                    while (i != token->characters_length && (islower(token->characters[i]) || isdigit(token->characters[i])))
                         i++;
 
-                    if (i + 1 <= token->code_points_length && token->code_points[i] == '_' && isupper(token->code_points[i + 1]))
+                    if (i + 1 <= token->characters_length && token->characters[i] == '_' && isupper(token->characters[i + 1]))
                         i++;
                     else
                         break;
 
-                } while (isupper(token->code_points[i]));
+                } while (isupper(token->characters[i]));
                 
-                if (i == token->code_points_length)
+                if (i == token->characters_length)
                     token->tag = Token_Tag_type;
             }
         }
         else
         {
-            while (index != line->code_points_length && !isspace(line->code_points[index]) && !ispunct(line->code_points[index]))
+            while (index != line->characters_length && !isspace(line->characters[index]) && !ispunct(line->characters[index]))
                 index++;
 
-            token->code_points_length = index - start_index;
+            token->characters_length = index - start_index;
         }
     }
 
@@ -494,13 +494,13 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
 
 static int compare_keyword_length_ascending(const void* a, const void* b)
 {
-    return ((Predefined_Type*)a)->code_points_length - ((Predefined_Type*)b)->code_points_length;
+    return ((Predefined_Type*)a)->characters_length - ((Predefined_Type*)b)->characters_length;
 }
 
 bool initialize_lexer(void)
 {
     size_t file_length;
-    uint32_t* file = read_file("c_types.txt", &file_length);
+    char* file = read_file("c_types.txt", &file_length);
     if (!file)
     {
         show_initialization_error_message("Could not read c_types.txt");
@@ -534,8 +534,8 @@ bool initialize_lexer(void)
 
         predefined_c_types[predefined_c_types_length++] = (Predefined_Type)
         {
-            .code_points = &file[file_start_index],
-            .code_points_length = (uint8_t)(end_of_line_index - file_start_index)
+            .characters = &file[file_start_index],
+            .characters_length = (uint8_t)(end_of_line_index - file_start_index)
         };
     }
 

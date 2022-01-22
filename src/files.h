@@ -2,4 +2,4 @@
 
 #include <stdint.h>
 
-uint32_t* read_file(char* path, size_t* code_points_length);
+char* read_file(char* path, size_t* characters_length);

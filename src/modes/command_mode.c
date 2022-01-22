@@ -18,7 +18,7 @@ void exit_command_mode(void)
     clear_command();
 }
 
-void insert_code_point_into_command(const uint32_t code_point)
+void insert_character_into_command(const char character)
 {
     if (editor.command_length == editor.command_capacity)
     {
@@ -26,7 +26,7 @@ void insert_code_point_into_command(const uint32_t code_point)
         editor.command = realloc(editor.command, sizeof(editor.command[0]) * editor.command_capacity);
     }
 
-    editor.command[editor.command_length++] = code_point;
+    editor.command[editor.command_length++] = character;
     editor.command_cursor++;
 
     editor.refresh_needed = true;
@@ -54,7 +54,7 @@ void execute_command(void)
     exit_command_mode();
 }
 
-void delete_current_code_point_in_command(void)
+void delete_current_character_in_command(void)
 {
     if (editor.command_cursor == editor.command_length)
         return;
@@ -68,7 +68,7 @@ void delete_current_code_point_in_command(void)
     editor.refresh_needed = true;
 }
 
-void delete_previous_code_point_in_command(void)
+void delete_previous_character_in_command(void)
 {
     if (!editor.command_cursor)
         return;

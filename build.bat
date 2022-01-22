@@ -11,7 +11,7 @@ set sources= src/*.c ^
              
 set libraries= "%cd%\windows\SDL2-2.0.16\lib\x64\SDL2.lib" ^
                "%cd%\windows\SDL2-2.0.16\lib\x64\SDL2main.lib" ^
-               Shell32.lib 
+               Shell32.lib
                
 set includes= -Iwindows\SDL2-2.0.16\include
          

@@ -34,9 +34,9 @@ SDL_Color background_colors[] =
     [Font_Color_keyword] = PLAIN_TEXT_BACKGROUND_COLOR,
     [Font_Color_string] = PLAIN_TEXT_BACKGROUND_COLOR,
     [Font_Color_type] = PLAIN_TEXT_BACKGROUND_COLOR,
-    [Font_Color_inactive_tab_header] = { 0x21, 0x2B, 0x30, SDL_ALPHA_OPAQUE },
+    [Font_Color_inactive_tab_header] = { 31, 38, 42, SDL_ALPHA_OPAQUE },
     [Font_Color_active_tab_header] = PLAIN_TEXT_BACKGROUND_COLOR,
-    [Font_Color_mode] = { 0x21, 0x2B, 0x30, SDL_ALPHA_OPAQUE },
+    [Font_Color_mode] = { 31, 38, 42, SDL_ALPHA_OPAQUE },
     [Font_Color_selected] = PLAIN_TEXT_FOREGROUND_COLOR,
 };
 

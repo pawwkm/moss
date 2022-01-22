@@ -89,7 +89,7 @@ void move_cursor_to_the_first_non_space_in_the_line_in_active_view(void)
     const Line* const line = &buffer->lines[view->offset.line + view->cursor.line];
 
     uint16_t column = 0;
-    while (column < line->code_points_length && (line->code_points[column] == ' ' || line->code_points[column] == '\t'))
+    while (column < line->characters_length && (line->characters[column] == ' ' || line->characters[column] == '\t'))
         column++;
 
     go_to(view, editor.tabs[editor.active_tab_index].rectangle, false, (Location)
@@ -116,6 +116,6 @@ void move_cursor_to_the_end_of_the_line_in_active_view(void)
     editor.refresh_needed = go_to(view, editor.tabs[editor.active_tab_index].rectangle, false, (Location)
     {
         .line = view->offset.line + view->cursor.line,
-        .column = line->code_points_length
+        .column = line->characters_length
     });
 }
