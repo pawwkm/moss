@@ -1764,8 +1764,6 @@ static void place_texture_offsets(void)
                 .y = y_offset,
                 .x = (uint16_t)color * FONT_WIDTH
             };
-
-            SDL_Log("index:%u Color:%u %u:%u.\n", offset_index, color, font_offsets[offset_index][color].x, font_offsets[offset_index][color].y);
         }
 
         if (offset_index == UINT8_MAX)

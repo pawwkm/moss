@@ -204,18 +204,30 @@ void close_buffer(Buffer_Handle handle)
 void flush_buffer(Buffer_Handle handle)
 {
     const Buffer* const buffer = buffer_handle_to_pointer(handle);
+
     SDL_RWops* file = SDL_RWFromFile(buffer->path, "wb");
+    if (!file)
+    {
+        SDL_Log("Could not open %s: %s\n", buffer->path, SDL_GetError());
+        return;
+    }
 
     for (uint16_t l = 0; l < buffer->lines_length; l++)
     {
         if (l)
-            SDL_RWwrite(file, &"\n", 1, 1);
+        {
+            if (SDL_RWwrite(file, &"\n", 1, 1) != 1)
+                SDL_Log("Could not write \\n to %s: %s\n", buffer->path, SDL_GetError());
+        }
 
         const Line* const line = &buffer->lines[l];
-        SDL_RWwrite(file, line->characters, 1, line->characters_length);
+        size_t characters_written = SDL_RWwrite(file, line->characters, 1, line->characters_length);
+        if (characters_written != line->characters_length)
+            SDL_Log("Wrote %u characters out of %u to %s: %s\n", characters_written, line->characters_length, buffer->path, SDL_GetError());
     }
 
-    SDL_RWclose(file);
+    if (SDL_RWclose(file) < 0)
+        SDL_Log("Could not close %s: %s\n", buffer->path, SDL_GetError());
 }
 
 bool has_unflushed_changes(Buffer_Handle handle)
