@@ -136,13 +136,6 @@ static bool lex_c_character(Line* line, uint16_t* index, bool is_string)
         return false;
 }
 
-// These are sorted by length ascending order which 
-// is used to bail out of a loop early if next type
-// is longer than expected.
-static Predefined_Type* predefined_c_types;
-static uint16_t predefined_c_types_length;
-static uint16_t predefined_c_types_capacity;
-
 static bool last_token_is_preceeded_by_pound_sign(const Line* const line)
 {
     for (int32_t i = line->tokens_length - 2; i >= 0; i--)
@@ -162,7 +155,7 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
     // These are sorted by length ascending order which 
     // is used to bail out of a loop early if next keyword
     // is longer than expected.
-    static Predefined_Word keywords[47] =
+    static String_Slice keywords[47] =
     {
         { 2,  "if"             },
         { 2,  "do"             },
@@ -211,6 +204,193 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
         { 10, "_Imaginary"     },
         { 13, "_Thread_local"  },
         { 14, "_Static_assert" }
+    };
+
+    // These are sorted by length ascending order which 
+    // is used to bail out of a loop early if next type
+    // is longer than expected.
+    static String_Slice predefined_c_types[] =
+    {
+        { 2,  "tm" },
+        { 4,  "bool" },
+        { 4,  "FILE" },
+        { 5,  "Sint8" },
+        { 5,  "Uint8" },
+        { 6,  "Sint16" },
+        { 6,  "Sint32" },
+        { 6,  "Sint64" },
+        { 6,  "Uint16" },
+        { 6,  "Uint32" },
+        { 6,  "Uint64" },
+        { 7,  "SDL_sem" },
+        { 7,  "va_list" },
+        { 8,  "MD5UINT4" },
+        { 8,  "NSWindow" },
+        { 8,  "SDL_bool" },
+        { 8,  "SDL_cond" },
+        { 8,  "SDL_Rect" },
+        { 8,  "timespec" },
+        { 8,  "UIWindow" },
+        { 9,  "SDL_Color" },
+        { 9,  "SDL_Event" },
+        { 9,  "SDL_FRect" },
+        { 9,  "SDL_mutex" },
+        { 9,  "SDL_Point" },
+        { 9,  "SDL_RWops" },
+        { 9,  "SDL_TLSID" },
+        { 10, "SDL_Finger" },
+        { 10, "SDL_FPoint" },
+        { 10, "SDL_GLattr" },
+        { 10, "SDL_Haptic" },
+        { 10, "SDL_Keymod" },
+        { 10, "SDL_Keysym" },
+        { 10, "SDL_Locale" },
+        { 10, "SDL_Sensor" },
+        { 10, "SDL_Thread" },
+        { 10, "SDL_Window" },
+        { 11, "SDL_KeyCode" },
+        { 11, "SDL_OSEvent" },
+        { 11, "SDL_Palette" },
+        { 11, "SDL_Surface" },
+        { 11, "SDL_Texture" },
+        { 11, "SDL_TimerID" },
+        { 11, "SDL_TouchID" },
+        { 11, "SDL_version" },
+        { 12, "ID3D11Device" },
+        { 12, "SDL_AudioCVT" },
+        { 12, "SDL_Joystick" },
+        { 12, "SDL_Renderer" },
+        { 12, "SDL_Scancode" },
+        { 12, "SDL_SensorID" },
+        { 12, "SDL_SpinLock" },
+        { 12, "SDL_SysWMmsg" },
+        { 12, "SDL_SysWMmsg" },
+        { 12, "SDL_threadID" },
+        { 13, "SDL_AudioSpec" },
+        { 13, "SDL_BlendMode" },
+        { 13, "SDL_DropEvent" },
+        { 13, "SDL_errorcode" },
+        { 13, "SDL_EventType" },
+        { 13, "SDL_GestureID" },
+        { 13, "SDL_GLContext" },
+        { 13, "SDL_GLprofile" },
+        { 13, "SDL_main_func" },
+        { 13, "SDL_MetalView" },
+        { 13, "SDL_PixelType" },
+        { 13, "SDL_QuitEvent" },
+        { 13, "SDL_ScaleMode" },
+        { 13, "SDL_SysWMinfo" },
+        { 13, "SDL_UserEvent" },
+        { 14, "SDL_ArrayOrder" },
+        { 14, "SDL_AssertData" },
+        { 14, "SDL_HapticRamp" },
+        { 14, "SDL_PowerState" },
+        { 14, "SDL_SensorType" },
+        { 14, "SDL_SYSWM_TYPE" },
+        { 14, "SDL_SysWMEvent" },
+        { 14, "SDL_WinRT_Path" },
+        { 15, "SDL_AssertState" },
+        { 15, "SDL_AudioFilter" },
+        { 15, "SDL_AudioFormat" },
+        { 15, "SDL_AudioStream" },
+        { 15, "SDL_BitmapOrder" },
+        { 15, "SDL_BlendFactor" },
+        { 15, "SDL_CommonEvent" },
+        { 15, "SDL_DisplayMode" },
+        { 15, "SDL_eventaction" },
+        { 15, "SDL_JoyHatEvent" },
+        { 15, "SDL_LogCategory" },
+        { 15, "SDL_LogPriority" },
+        { 15, "SDL_PackedOrder" },
+        { 15, "SDL_PixelFormat" },
+        { 15, "SDL_SensorEvent" },
+        { 15, "SDL_WindowEvent" },
+        { 15, "SDL_WindowFlags" },
+        { 15, "WindowShapeMode" },
+        { 16, "IDirect3DDevice9" },
+        { 16, "SDL_DisplayEvent" },
+        { 16, "SDL_HapticCustom" },
+        { 16, "SDL_HapticEffect" },
+        { 16, "SDL_HintCallback" },
+        { 16, "SDL_HintPriority" },
+        { 16, "SDL_JoyAxisEvent" },
+        { 16, "SDL_JoyBallEvent" },
+        { 16, "SDL_JoystickGUID" },
+        { 16, "SDL_JoystickType" },
+        { 16, "SDL_PackedLayout" },
+        { 16, "SDL_RendererFlip" },
+        { 16, "SDL_RendererInfo" },
+        { 16, "SDL_SystemCursor" },
+        { 16, "UIViewController" },
+        { 17, "SDL_AudioCallback" },
+        { 17, "SDL_AudioDeviceID" },
+        { 17, "SDL_GLcontextFlag" },
+        { 17, "SDL_KeyboardEvent" },
+        { 17, "SDL_RendererFlags" },
+        { 17, "SDL_TextureAccess" },
+        { 17, "SDL_TimerCallback" },
+        { 17, "SDL_vulkanSurface" },
+        { 17, "SDL_WindowEventID" },
+        { 18, "SDL_BlendOperation" },
+        { 18, "SDL_DisplayEventID" },
+        { 18, "SDL_FlashOperation" },
+        { 18, "SDL_GameController" },
+        { 18, "SDL_HapticConstant" },
+        { 18, "SDL_HapticPeriodic" },
+        { 18, "SDL_JoyButtonEvent" },
+        { 18, "SDL_JoyDeviceEvent" },
+        { 18, "SDL_MessageBoxData" },
+        { 18, "SDL_TextInputEvent" },
+        { 18, "SDL_ThreadFunction" },
+        { 18, "SDL_ThreadPriority" },
+        { 18, "SDL_vulkanInstance" },
+        { 18, "SDLTest_Md5Context" },
+        { 19, "SDL_HapticCondition" },
+        { 19, "SDL_HapticDirection" },
+        { 19, "SDL_HapticLeftRight" },
+        { 19, "SDL_MessageBoxColor" },
+        { 19, "SDL_MessageBoxFlags" },
+        { 19, "SDL_MouseWheelEvent" },
+        { 19, "SDL_PixelFormatEnum" },
+        { 19, "SDL_TextureModulate" },
+        { 19, "SDL_TouchDeviceType" },
+        { 19, "SDL_WindowShapeMode" },
+        { 19, "SDLTest_CommonState" },
+        { 20, "SDL_AssertionHandler" },
+        { 20, "SDL_AudioDeviceEvent" },
+        { 20, "SDL_MouseButtonEvent" },
+        { 20, "SDL_MouseMotionEvent" },
+        { 20, "SDL_TextEditingEvent" },
+        { 20, "SDL_TouchFingerEvent" },
+        { 21, "SDL_LogOutputFunction" },
+        { 21, "SDL_MultiGestureEvent" },
+        { 21, "SDL_WindowShapeParams" },
+        { 21, "SDLTest_RandomContext" },
+        { 22, "SDL_DisplayOrientation" },
+        { 22, "SDL_DollarGestureEvent" },
+        { 22, "SDL_GameControllerAxis" },
+        { 22, "SDL_GameControllerType" },
+        { 22, "SDL_JoystickPowerLevel" },
+        { 22, "SDL_WindowsMessageHook" },
+        { 22, "SDL_WinRT_DeviceFamily" },
+        { 23, "pfnSDL_CurrentEndThread" },
+        { 23, "SDL_ControllerAxisEvent" },
+        { 23, "SDL_MessageBoxColorType" },
+        { 23, "SDL_MouseWheelDirection" },
+        { 23, "SDL_YUV_CONVERSION_MODE" },
+        { 24, "SDL_GameControllerButton" },
+        { 24, "SDL_GLcontextReleaseFlag" },
+        { 24, "SDL_MessageBoxButtonData" },
+        { 25, "pfnSDL_CurrentBeginThread" },
+        { 25, "SDL_ControllerButtonEvent" },
+        { 25, "SDL_ControllerDeviceEvent" },
+        { 25, "SDL_ControllerSensorEvent" },
+        { 25, "SDL_MessageBoxButtonFlags" },
+        { 25, "SDL_MessageBoxColorScheme" },
+        { 26, "SDL_GameControllerBindType" },
+        { 27, "SDL_ControllerTouchpadEvent" },
+        { 28, "SDL_GameControllerButtonBind" },
+        { 30, "SDL_GLContextResetNotification" }
     };
 
     uint16_t index = 0;
@@ -321,7 +501,7 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
             token->characters_length = index - start_index;
             for (uint8_t k = 0; k < sizeof(keywords) / sizeof(keywords[0]); k++)
             {
-                Predefined_Word* const keyword = &keywords[k];
+                String_Slice* const keyword = &keywords[k];
                 if (keyword->characters_length > token->characters_length)
                     break;
 
@@ -347,9 +527,9 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
                 continue;
             }
 
-            for (uint16_t t = 0; t < predefined_c_types_length; t++)
+            for (uint16_t t = 0; t < sizeof(predefined_c_types) / sizeof(predefined_c_types[0]); t++)
             {
-                Predefined_Type* type = &predefined_c_types[t];
+                String_Slice* type = &predefined_c_types[t];
                 if (type->characters_length > token->characters_length)
                     break;
 
@@ -397,56 +577,4 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
     }
 
     *continue_multiline_comment = false;
-}
-
-static int compare_keyword_length_ascending(const void* a, const void* b)
-{
-    return ((Predefined_Type*)a)->characters_length - ((Predefined_Type*)b)->characters_length;
-}
-
-bool initialize_lexer(void)
-{
-    size_t file_length;
-    char* file = read_file("c_types.txt", &file_length);
-    if (!file)
-    {
-        show_initialization_error_message("Could not read c_types.txt");
-        return false;
-    }
-
-    size_t file_index = 0;
-    while (file_index != file_length)
-    {
-        size_t file_start_index = file_index;
-        size_t end_of_line_index = 0;
-
-        while (file_index != file_length)
-        {
-            if (file[file_index] == '\n')
-            {
-                end_of_line_index = file_index;
-                file_index++;
-
-                break;
-            }
-            else
-                end_of_line_index = ++file_index;
-        }
-
-        if (predefined_c_types_length == predefined_c_types_capacity)
-        {
-            predefined_c_types_capacity = predefined_c_types_capacity ? predefined_c_types_capacity * 2 : 4;
-            predefined_c_types = realloc(predefined_c_types, sizeof(predefined_c_types[0]) * predefined_c_types_capacity);
-        }
-
-        predefined_c_types[predefined_c_types_length++] = (Predefined_Type)
-        {
-            .characters = &file[file_start_index],
-            .characters_length = (uint8_t)(end_of_line_index - file_start_index)
-        };
-    }
-
-    qsort(predefined_c_types, predefined_c_types_length, sizeof(Predefined_Type), compare_keyword_length_ascending);
-
-    return true;
 }

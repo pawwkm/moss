@@ -12,13 +12,7 @@ typedef struct
 {
     uint8_t characters_length;
     char* characters;
-} Predefined_Word;
-
-typedef struct
-{
-    uint8_t characters_length;
-    char* characters;
-} Predefined_Type;
+} String_Slice;
 
 void lexical_analyze_c(Line* line, bool* continue_multiline_comment);
 void lexical_analyze_owen(Line* line);

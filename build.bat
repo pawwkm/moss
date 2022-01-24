@@ -35,4 +35,3 @@ cl %sources% %compiler_options% %defines% %includes% /link %linker_options% %lib
 
 copy character_map.txt bin\ /y
 copy windows\SDL2-2.0.16\lib\x64\SDL2.dll bin\ /y
-copy c_types.txt bin\ /y

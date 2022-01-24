@@ -141,39 +141,37 @@ int main(int argc, char *argv[])
 {
     initialize_window();
     initialize_renderer(window);
-    if (initialize_lexer())
+
+    for (int i = 1; i < argc; i++)
     {
-        for (int i = 1; i < argc; i++)
+        const size_t path_length = strlen(argv[i]);
+        if (path_length > UINT16_MAX)
         {
-            const size_t path_length = strlen(argv[i]);
-            if (path_length > UINT16_MAX)
-            {
-                show_message("Path to long");
-                continue;
-            }
-
-            char* const path = malloc(path_length + 1);
-
-            strcpy(path, argv[i]);
-            open_buffer_in_active_tab(path, (uint16_t)path_length);
+            show_message("Path to long");
+            continue;
         }
 
-        if (!SDL_IsTextInputActive())
-            SDL_StartTextInput();
+        char* const path = malloc(path_length + 1);
+
+        strcpy(path, argv[i]);
+        open_buffer_in_active_tab(path, (uint16_t)path_length);
+    }
+
+    if (!SDL_IsTextInputActive())
+        SDL_StartTextInput();
+
+    render_editor();
+    while (!close_requested)
+    {
+        SDL_Event event;
+        if (SDL_WaitEvent(&event))
+        {
+            handle_event(&event);
+            while (SDL_PollEvent(&event))
+                handle_event(&event);
+        }
 
         render_editor();
-        while (!close_requested)
-        {
-            SDL_Event event;
-            if (SDL_WaitEvent(&event))
-            {
-                handle_event(&event);
-                while (SDL_PollEvent(&event))
-                    handle_event(&event);
-            }
-
-            render_editor();
-        }
     }
 
     uninitialize_renderer();

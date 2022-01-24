@@ -13,5 +13,4 @@ void flush_buffer(Buffer_Handle handle);
 
 bool has_unflushed_changes(Buffer_Handle handle);
 
-bool initialize_lexer(void);
 void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment);

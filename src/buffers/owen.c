@@ -40,7 +40,7 @@ void lexical_analyze_owen(Line* const line)
     // These are sorted by length ascending order which 
     // is used to bail out of a loop early if next keyword
     // is longer than expected.
-    static Predefined_Word keywords[] = 
+    static String_Slice keywords[] = 
     {
         { 2,  "if"          },
         { 3,  "use"         },
@@ -144,7 +144,7 @@ void lexical_analyze_owen(Line* const line)
                 token->characters_length = index - start_index;
                 for (uint8_t k = 0; k < sizeof(keywords) / sizeof(keywords[0]); k++)
                 {
-                    Predefined_Word* keyword = &keywords[k];
+                    String_Slice* keyword = &keywords[k];
                     if (keyword->characters_length > token->characters_length)
                         break;
 
