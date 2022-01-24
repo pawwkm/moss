@@ -25,20 +25,6 @@ static uint16_t logical_columns_to_rendered_columns(const Line* const line, cons
 
 void render_line(const Line* line, const Location offset, const Location cursor, const bool render_cursor, const Rectangle line_rectangle)
 {
-    if (!line->characters_length && render_cursor)
-    {
-        set_render_draw_color(background_colors[Font_Color_selected]);
-        SDL_RenderFillRect(renderer, &(SDL_Rect)
-        {
-            .x = line_rectangle.position.x,
-            .y = line_rectangle.position.y,
-            .w = FONT_WIDTH,
-            .h = FONT_HEIGHT
-        });
-
-        return;
-    }
-
     uint16_t columns_rendered = 0;
     uint16_t characters_to_skip = offset.column;
     for (uint16_t t = 0; t < line->tokens_length; t++)
