@@ -164,146 +164,53 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
     // is longer than expected.
     static Predefined_Word keywords[47] =
     {
-        // if
-        { 2, { 0x69, 0x66 } },
-
-        // do
-        { 2, { 0x64, 0x6F } },
-
-        // int
-        { 3, { 0x69, 0x6E, 0x74 } },
-
-        // for
-        { 3, { 0x66, 0x6F, 0x72 } },
-
-        // case
-        { 4, { 0x63, 0x61, 0x73, 0x65 } },
-
-        // char
-        { 4, { 0x63, 0x68, 0x61, 0x72 } },
-
-        // auto
-        { 4, { 0x61, 0x75, 0x74, 0x6F } },
-
-        // goto
-        { 4, { 0x67, 0x6F, 0x74, 0x6F } },
-
-        // long
-        { 4, { 0x6C, 0x6F, 0x6E, 0x67 } },
-
-        // else
-        { 4, { 0x65, 0x6C, 0x73, 0x65 } },
-
-        // enum
-        { 4, { 0x65, 0x6E, 0x75, 0x6D } },
-
-        // void
-        { 4, { 0x76, 0x6F, 0x69, 0x64 } },
-
-        // break
-        { 5, { 0x62, 0x72, 0x65, 0x61, 0x6B } },
-
-        // const
-        { 5, { 0x63, 0x6F, 0x6E, 0x73, 0x74 } },
-
-        // float
-        { 5, { 0x66, 0x6C, 0x6F, 0x61, 0x74 } },
-
-        // union
-        { 5, { 0x75, 0x6E, 0x69, 0x6F, 0x6E } },
-
-        // short
-        { 5, { 0x73, 0x68, 0x6F, 0x72, 0x74 } },
-
-        // while
-        { 5, { 0x77, 0x68, 0x69, 0x6C, 0x65 } },
-
-        // _Bool
-        { 5, { 0x5F, 0x42, 0x6F, 0x6F, 0x6C } },
-
-        // double
-        { 6, { 0x64, 0x6F, 0x75, 0x62, 0x6C, 0x65 } },
-
-        // extern
-        { 6, { 0x65, 0x78, 0x74, 0x65, 0x72, 0x6E } },
-
-        // inline
-        { 6, { 0x69, 0x6E, 0x6C, 0x69, 0x6E, 0x65 } },
-
-        // return
-        { 6, { 0x72, 0x65, 0x74, 0x75, 0x72, 0x6E } },
-
-        // signed
-        { 6, { 0x73, 0x69, 0x67, 0x6E, 0x65, 0x64 } },
-
-        // sizeof
-        { 6, { 0x73, 0x69, 0x7A, 0x65, 0x6F, 0x66 } },
-
-        // static
-        { 6, { 0x73, 0x74, 0x61, 0x74, 0x69, 0x63 } },
-
-        // struct
-        { 6, { 0x73, 0x74, 0x72, 0x75, 0x63, 0x74 } },
-
-        // switch
-        { 6, { 0x73, 0x77, 0x69, 0x74, 0x63, 0x68 } },
-
-        // default
-        { 7, { 0x64, 0x65, 0x66, 0x61, 0x75, 0x6C, 0x74 } },
-
-        // _Atomic
-        { 7, { 0x5F, 0x41, 0x74, 0x6F, 0x6D, 0x69, 0x63 } },
-
-        // typedef
-        { 7, { 0x74, 0x79, 0x70, 0x65, 0x64, 0x65, 0x66 } },
-
-        // continue
-        { 8, { 0x63, 0x6F, 0x6E, 0x74, 0x69, 0x6E, 0x75, 0x65 } },
-        
-        // register
-        { 8, { 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72 } },
-
-        // restrict
-        { 8, { 0x72, 0x65, 0x73, 0x74, 0x72, 0x69, 0x63, 0x74 } },
-
-        // unsigned
-        { 8, { 0x75, 0x6E, 0x73, 0x69, 0x67, 0x6E, 0x65, 0x64 } },
-
-        // volatile
-        { 8, { 0x76, 0x6F, 0x6C, 0x61, 0x74, 0x69, 0x6C, 0x65 } },
-
-        // _Alignas
-        { 8, { 0x5F, 0x41, 0x6C, 0x69, 0x67, 0x6E, 0x61, 0x73 } },
-
-        // _Alignof
-        { 8, { 0x5F, 0x41, 0x6C, 0x69, 0x67, 0x6E, 0x6F, 0x66 } },
-
-        // _Complex
-        { 8, { 0x5F, 0x43, 0x6F, 0x6D, 0x70, 0x6C, 0x65, 0x78 } },
-
-        // _Generic
-        { 8, { 0x5F, 0x47, 0x65, 0x6E, 0x65, 0x72, 0x69, 0x63 } },
-
-        // _Noreturn
-        { 9, { 0x5F, 0x4E, 0x6F, 0x72, 0x65, 0x74, 0x75, 0x72, 0x6E } },
-
-        // _Decimal128
-        { 11, { 0x5F, 0x44, 0x65, 0x63, 0x69, 0x6D, 0x61, 0x6C, 0x31, 0x32, 0x38 } },
-
-        // _Decimal32
-        { 10, { 0x5F, 0x44, 0x65, 0x63, 0x69, 0x6D, 0x61, 0x6C, 0x33, 0x32 } },
-
-        // _Decimal64
-        { 10, { 0x5F, 0x44, 0x65, 0x63, 0x69, 0x6D, 0x61, 0x6C, 0x36, 0x34 } },
-
-        // _Imaginary
-        { 10, { 0x5F, 0x49, 0x6D, 0x61, 0x67, 0x69, 0x6E, 0x61, 0x72, 0x79 } },
-
-        // _Thread_local
-        { 13, { 0x5F, 0x54, 0x68, 0x72, 0x65, 0x61, 0x64, 0x5F, 0x6C, 0x6F, 0x63, 0x61, 0x6C } },
-
-        // _Static_assert
-        { 14, { 0x5F, 0x53, 0x74, 0x61, 0x74, 0x69, 0x63, 0x5F, 0x61, 0x73, 0x73, 0x65, 0x72, 0x74 } },
+        { 2,  "if"             },
+        { 2,  "do"             },
+        { 3,  "int"            },
+        { 3,  "for"            },
+        { 4,  "case"           },
+        { 4,  "char"           },
+        { 4,  "auto"           },
+        { 4,  "goto"           },
+        { 4,  "long"           },
+        { 4,  "else"           },
+        { 4,  "enum"           },
+        { 4,  "void"           },
+        { 5,  "break"          },
+        { 5,  "const"          },
+        { 5,  "float"          },
+        { 5,  "union"          },
+        { 5,  "short"          },
+        { 5,  "while"          },
+        { 5,  "_Bool"          },
+        { 6,  "double"         },
+        { 6,  "extern"         },
+        { 6,  "inline"         },
+        { 6,  "return"         },
+        { 6,  "signed"         },
+        { 6,  "sizeof"         },
+        { 6,  "static"         },
+        { 6,  "struct"         },
+        { 6,  "switch"         },
+        { 7,  "default"        },
+        { 7,  "_Atomic"        },
+        { 7,  "typedef"        },
+        { 8,  "continue"       },
+        { 8,  "register"       },
+        { 8,  "restrict"       },
+        { 8,  "unsigned"       },
+        { 8,  "volatile"       },
+        { 8,  "_Alignas"       },
+        { 8,  "_Alignof"       },
+        { 8,  "_Complex"       },
+        { 8,  "_Generic"       },
+        { 9,  "_Noreturn"      },
+        { 11, "_Decimal128"    },
+        { 10, "_Decimal32"     },
+        { 10, "_Decimal64"     },
+        { 10, "_Imaginary"     },
+        { 13, "_Thread_local"  },
+        { 14, "_Static_assert" }
     };
 
     uint16_t index = 0;
@@ -421,7 +328,7 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
                 if (keyword->characters_length != token->characters_length)
                     continue;
 
-                if (!memcmp(token->characters, &keyword->characters, sizeof(keyword->characters[0]) * keyword->characters_length))
+                if (!strncmp(token->characters, keyword->characters, keyword->characters_length))
                 {
                     if (k != 0 || !last_token_is_preceeded_by_pound_sign(line))
                         token->tag = Token_Tag_keyword;

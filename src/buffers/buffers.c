@@ -122,7 +122,6 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
             break;
     }
 
-
     // TODO: Error handle files with too long lines and too many lines.
     Line* line = add_line(buffer);
     size_t file_index = 0;
@@ -162,7 +161,7 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
                 line->characters_capacity = line->characters_capacity ? line->characters_capacity * 2 : 4;
 
             line->characters = malloc(sizeof(file[0]) * line->characters_capacity);
-            memcpy(line->characters, &file[line_start_index], sizeof(line->characters[0]) * line->characters_length);
+            memcpy(line->characters, &file[line_start_index], line->characters_length);
         }
     }
 

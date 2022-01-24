@@ -42,77 +42,28 @@ void lexical_analyze_owen(Line* const line)
     // is longer than expected.
     static Predefined_Word keywords[] = 
     {
-        // if
-        { 2, { 0x69, 0x66 } },
-
-        // use
-        { 3, { 0x75, 0x73, 0x65 } },
-
-        // end
-        { 3, { 0x65, 0x6E, 0x64 } },
-
-        // for
-        { 3, { 0x66, 0x6F, 0x72 } },
-
-        // elif
-        { 4, { 0x65, 0x6C, 0x69, 0x66 } },
-
-        // else
-        { 4, { 0x65, 0x6C, 0x73, 0x65 } },
-
-        // true
-        { 4, { 0x74, 0x72, 0x75, 0x65 } },
-
-        // null
-        { 4, { 0x6E, 0x75, 0x6C, 0x6C } },
-
-        // while
-        { 5, { 0x77, 0x68, 0x69, 0x6C, 0x65 } },
-
-        // break
-        { 5, { 0x62, 0x72, 0x65, 0x61, 0x6B } },
-
-        // union
-        { 5, { 0x75, 0x6E, 0x69, 0x6F, 0x6E } },
-
-        // false
-        { 5, { 0x66, 0x61, 0x6C, 0x73, 0x65 } },
-
-        // public
-        { 6, { 0x70, 0x75, 0x62, 0x6C, 0x69, 0x63 } },
-
-        // sizeof
-        { 6, { 0x73, 0x69, 0x7A, 0x65, 0x6F, 0x66 } },
-
-        // return
-        { 6, { 0x72, 0x65, 0x74, 0x75, 0x72, 0x6E } },
-
-        // assert
-        { 6, { 0x61, 0x73, 0x73, 0x65, 0x72, 0x74 } },
-
-        // version
-        { 7, { 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E } },
-
-        // external
-        { 8, { 0x65, 0x78, 0x74, 0x65, 0x72, 0x6E, 0x61, 0x6C } },
-
-        // function
-        { 8, { 0x66, 0x75, 0x6E, 0x63, 0x74, 0x69, 0x6F, 0x6E } },
-
-        // continue
-        { 8, { 0x63, 0x6F, 0x6E, 0x74, 0x69, 0x6E, 0x75, 0x65 } },
-
-        // structure
-        { 9, { 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x75, 0x72, 0x65 } },
-
-        // namespace      
-        { 9, { 0x6E, 0x61, 0x6D, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65 } },
-
-        // proposition
-        { 11, { 0x70, 0x72, 0x6F, 0x70, 0x6F, 0x73, 0x69, 0x74, 0x69, 0x6F, 0x6E } },
-
-        // enumeration
-        { 11, { 0x65, 0x6E, 0x75, 0x6D, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6F, 0x6E } },
+        { 2,  "if"          },
+        { 3,  "use"         },
+        { 3,  "end"         },
+        { 3,  "for"         },
+        { 4,  "elif"        },
+        { 4,  "else"        },
+        { 4,  "true"        },
+        { 4,  "null"        },
+        { 5,  "while"       },
+        { 5,  "break"       },
+        { 5,  "union"       },
+        { 5,  "false"       },
+        { 6,  "public"      },
+        { 6,  "sizeof"      },
+        { 6,  "return"      },
+        { 7,  "version"     },
+        { 8,  "external"    },
+        { 8,  "function"    },
+        { 8,  "continue"    },
+        { 9,  "structure"   },
+        { 9,  "namespace"   },
+        { 11, "enumeration" },
     };
 
     uint16_t index = 0;
@@ -200,7 +151,7 @@ void lexical_analyze_owen(Line* const line)
                     if (keyword->characters_length != token->characters_length)
                         continue;
 
-                    if (!memcmp(token->characters, &keyword->characters, sizeof(keyword->characters[0]) * keyword->characters_length))
+                    if (!strncmp(token->characters, keyword->characters, keyword->characters_length))
                     {
                         token->tag = Token_Tag_keyword;
                         break;
@@ -247,8 +198,10 @@ void lexical_analyze_owen(Line* const line)
                     if (previous_token->tag != Token_Tag_keyword)
                         break;
 
-                    if (compare_predefined_word(&keywords[1], 0, previous_token->characters, previous_token->characters_length) ||
-                        compare_predefined_word(&keywords[21], 0, previous_token->characters, previous_token->characters_length))
+                    // Upper case identifiers preceded by the namespace or use 
+                    // keywords are not types.
+                    if (previous_token->characters_length == 3 && !strncmp("use",       previous_token->characters, 3) ||
+                        previous_token->characters_length == 9 && !strncmp("namespace", previous_token->characters, 9))
                         token->tag = Token_Tag_plain;
 
                     break;
@@ -257,7 +210,6 @@ void lexical_analyze_owen(Line* const line)
         }
         else
         {
-            // Pretend that there is only 127 characters.
             while (index != line->characters_length && !isspace(line->characters[index]) && !ispunct(line->characters[index]))
                 index++;
 

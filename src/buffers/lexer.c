@@ -4,14 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-bool compare_predefined_word(Predefined_Word* const word, const uint16_t index, const char* const restrict characters, const uint16_t characters_length)
-{
-    if (!word->characters_length || index + word->characters_length > characters_length)
-        return false;
-
-    return !memcmp(word->characters, &characters[index], sizeof(word->characters[0]) * word->characters_length);
-}
-
 void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment)
 {
     switch (language)
