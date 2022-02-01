@@ -196,14 +196,11 @@ static void go_up(View* const view, const uint16_t absolute_line)
     {
         if (view->offset.line && view->cursor.line + 1 == LINE_SCROLL_PADDING)
             view->offset.line--;
+        else if (view->cursor.line)
+            // This is within the first Tabs worth of lines.
+            view->cursor.line--;
         else
-        {
-            // This is within the first tabs worth of lines.
-            if (view->cursor.line)
-                view->cursor.line--;
-            else
-                view->offset.line--;
-        }
+            view->offset.line--;
     }
     else if (is_line_within_first_padded_page(absolute_line))
     {
@@ -239,13 +236,10 @@ static void go_down(View* const view, const uint16_t absolute_line)
             view->offset.line++;
             view->cursor.line--;
         }
+        else if (view->cursor.line + LINE_SCROLL_PADDING >= VISIBLE_LINES_IN_TAB)
+            view->offset.line++;
         else
-        {
-            if (view->cursor.line + LINE_SCROLL_PADDING >= VISIBLE_LINES_IN_TAB)
-                view->offset.line++;
-            else
-                view->cursor.line++;
-        }
+            view->cursor.line++;
     }
     else if (is_line_within_view(view, absolute_line))
     {
@@ -296,13 +290,10 @@ static void go_left(View* const view, const Rectangle view_rectangle, const uint
         view->offset.column = 0;
         view->cursor.column = absolute_column;
     }
-    else
-    {
-        if (view->offset.column <= absolute_column && view->offset.column + visible_columns > absolute_column)
-            view->cursor.column = absolute_column - view->offset.column;
-        else 
-            center_on_column(view, visible_columns, absolute_column);
-    }
+    else if (view->offset.column <= absolute_column && view->offset.column + visible_columns > absolute_column)
+        view->cursor.column = absolute_column - view->offset.column;
+    else 
+        center_on_column(view, visible_columns, absolute_column);
 }
 
 static void go_right(View* const view, const Rectangle view_rectangle, const uint16_t absolute_column)
@@ -313,13 +304,10 @@ static void go_right(View* const view, const Rectangle view_rectangle, const uin
         view->offset.column = 0;
         view->cursor.column = absolute_column;
     }
+    else if (view->offset.column <= absolute_column && view->offset.column + visible_columns > absolute_column)
+        view->cursor.column = absolute_column - view->offset.column;
     else
-    {
-        if (view->offset.column <= absolute_column && view->offset.column + visible_columns > absolute_column)
-            view->cursor.column = absolute_column - view->offset.column;
-        else
-            center_on_column(view, visible_columns, absolute_column);
-    }
+        center_on_column(view, visible_columns, absolute_column);
 }
 
 bool go_to(View* const view, const Rectangle view_rectangle, const bool use_preferred_column, Location absolute_location)

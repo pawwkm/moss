@@ -5,7 +5,7 @@
 void enter_command_mode(void)
 {
     SDL_Log("Mode_command");
-    editor.mode = Mode_command;
+    // editor.mode = Mode_command;
     editor.refresh_needed = true;
 }
 
@@ -34,8 +34,12 @@ void insert_character_into_command(const char character)
 
 void clear_command(void)
 {
-    editor.command_cursor = 0;
-    editor.command_length = 0;
+    if (editor.command_length)
+    {
+        editor.command_cursor = 0;
+        editor.command_length = 0;
+        editor.refresh_needed = true;
+    }
 }
 
 void execute_command(void)

@@ -15,7 +15,6 @@
 typedef enum
 {
     Mode_normal,
-    Mode_command,
     Mode_insert,
     Mode_visual,
     Mode_tab
@@ -56,6 +55,15 @@ typedef struct
     uint16_t tokens_capacity;
 } Line;
 
+// The cursor can be placed after the last character in a line which means that
+// characters are appended, not inserted. But that also means that if the editor
+// tries to read what is under the cursor it may overrun the line buffer by 1
+//
+// That is not really communicated well by using -1 in some places and not in 
+// others.
+#define INDEX_OF_LAST_CHARACTER(CHARACTERS_LENGTH) (CHARACTERS_LENGTH - 1)
+#define INDEX_OF_CHARACTER_APPEND(CHARACTERS_LENGTH) (CHARACTERS_LENGTH)
+
 typedef struct
 {
     uint16_t line;
@@ -70,19 +78,22 @@ typedef struct
 typedef enum
 {
     Change_Tag_break,
-    Change_Tag_insert_characters,
-    Change_Tag_remove_characters,
+    Change_Tag_insert_character,
+    Change_Tag_remove_character,
     Change_Tag_insert_line,
-    Change_Tag_remove_line
+    Change_Tag_remove_line,
+    Change_Tag_merge_line,
+    Change_Tag_split_line
 } Change_Tag;
 
 typedef struct
 {
     Change_Tag tag;
-    Location cursor;
-    char* characters;
-    uint16_t characters_length;
-    uint16_t characters_capacity;
+    union
+    {
+        Location cursor;
+        char character;
+    };
 } Change;
 
 typedef struct
@@ -98,8 +109,8 @@ typedef struct
     uint16_t file_name_length;
 
     Change* changes;
-    uint16_t changes_length;
-    uint16_t changes_capacity;
+    uint32_t changes_length;
+    uint32_t changes_capacity;
     int32_t last_flushed_change;
     int32_t current_change;
 
@@ -164,4 +175,8 @@ void set_editor_title(char* path, size_t path_length);
 
 void show_message(const char* message);
 
-void show_initialization_error_message(const char* message);
+void show_initialization_error_message(const char* message, ...);
+
+// ASCII
+bool is_space(char c);
+bool is_decimal(char c);

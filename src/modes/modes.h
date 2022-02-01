@@ -6,15 +6,7 @@
 #include "SDL.h"
 
 // NORMAL mode.
-void move_cursor_up_in_active_view(void);
-void move_cursor_down_in_active_view(void);
-void move_cursor_left_in_active_view(void);
-void move_cursor_right_in_active_view(void);
-
-void move_cursor_to_last_line_in_active_view(void);
-
-void move_cursor_to_the_first_non_space_in_the_line_in_active_view(void);
-void move_cursor_to_the_end_of_the_line_in_active_view(void);
+void input_character_in_normal_mode(char character);
 
 // INSERT mode.
 void enter_insert_mode(void);
@@ -56,3 +48,7 @@ void activate_left_hand_side_tab(void);
 void activate_right_hand_side_tab(void);
 
 void close_active_tab(void);
+
+// Motions
+bool motion_uses_prefered_column(char motion);
+

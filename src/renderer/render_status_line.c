@@ -75,10 +75,6 @@ static void render_mode(void)
             render_string("NORMAL", 6, &status_line_columns_rendered, Font_Color_mode, status_line_rectangle);
             break;
 
-        case Mode_command:
-            render_string("COMMAND", 7, &status_line_columns_rendered, Font_Color_mode, status_line_rectangle);
-            break;
-
         case Mode_insert:
             render_string("INSERT", 6, &status_line_columns_rendered, Font_Color_mode, status_line_rectangle);
             break;
@@ -91,15 +87,6 @@ static void render_mode(void)
             render_string("TAB", 3, &status_line_columns_rendered, Font_Color_mode, status_line_rectangle);
             break;
     }
-}
-
-static void render_command_line(void)
-{
-    status_line_columns_rendered++;
-    const uint16_t cursor_x = (status_line_columns_rendered + editor.command_cursor) * FONT_WIDTH;
-
-    render_string(editor.command, editor.command_length, &status_line_columns_rendered, Font_Color_inactive_tab_header, status_line_rectangle);
-    render_vertical_line(foreground_colors[Font_Color_inactive_tab_header], cursor_x, status_line_rectangle.position.y, STATUS_LINE_HEIGHT);
 }
 
 void render_status_line(void)
@@ -120,6 +107,12 @@ void render_status_line(void)
     render_mode();
 
     render_active_view_location();
-    if (editor.mode == Mode_command)
-        render_command_line();   
+    if (editor.command_length)
+    {
+        status_line_columns_rendered++;
+        const uint16_t cursor_x = (status_line_columns_rendered + editor.command_cursor) * FONT_WIDTH;
+
+        render_string(editor.command, editor.command_length, &status_line_columns_rendered, Font_Color_inactive_tab_header, status_line_rectangle);
+        render_vertical_line(foreground_colors[Font_Color_inactive_tab_header], cursor_x, status_line_rectangle.position.y, STATUS_LINE_HEIGHT);
+    }
 }

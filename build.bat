@@ -22,6 +22,10 @@ set compiler_options= /std:c17 ^
                       /Zi ^
                       /W4 ^
                       /WX ^
+                      /wd4701 ^
+                      /wd4703 ^
+                      /wd4706 ^
+                      /wd4201^
                       /diagnostics:caret
                       
 set linker_options= /OUT:bin\moss.exe ^
@@ -33,5 +37,4 @@ set linker_options= /OUT:bin\moss.exe ^
 
 cl %sources% %compiler_options% %defines% %includes% /link %linker_options% %libraries%
 
-copy character_map.txt bin\ /y
 copy windows\SDL2-2.0.16\lib\x64\SDL2.dll bin\ /y

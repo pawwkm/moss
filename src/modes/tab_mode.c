@@ -19,9 +19,11 @@ void exit_tab_mode(void)
 
 void move_active_view_to_the_left(void)
 {
+
     if (editor.tabs_length < 2 || editor.active_tab_index == 0)
         return;
 
+    // Draw the rest of the owl.
     editor.refresh_needed = true;
 }
 

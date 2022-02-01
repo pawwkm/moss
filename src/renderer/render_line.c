@@ -23,6 +23,18 @@ static uint16_t logical_columns_to_rendered_columns(const Line* const line, cons
     return column;
 }
 
+static void render_block_cursor(const uint16_t cursor_column, const Point position)
+{
+    set_render_draw_color(background_colors[Font_Color_selected]);
+    SDL_RenderFillRect(renderer, &(SDL_Rect)
+    {
+        .x = position.x + FONT_WIDTH * cursor_column,
+        .y = position.y,
+        .w = FONT_WIDTH,
+        .h = FONT_HEIGHT
+    });
+}
+
 void render_line(const Line* line, const Location offset, const Location cursor, const bool render_cursor, const Rectangle line_rectangle)
 {
     uint16_t columns_rendered = 0;
@@ -60,31 +72,13 @@ void render_line(const Line* line, const Location offset, const Location cursor,
     uint16_t cursor_column = logical_columns_to_rendered_columns(line, offset.column, offset.column + cursor.column);
     if (editor.mode == Mode_normal)
     {
-        if (offset.column + cursor.column == line->characters_length)
-        {
-            set_render_draw_color(background_colors[Font_Color_selected]);
-            SDL_RenderFillRect(renderer, &(SDL_Rect)
-            {
-                .x = line_rectangle.position.x + FONT_WIDTH * cursor_column,
-                .y = line_rectangle.position.y,
-                .w = FONT_WIDTH,
-                .h = FONT_HEIGHT
-            });
-        }
+        if (offset.column + cursor.column == INDEX_OF_CHARACTER_APPEND(line->characters_length))
+            render_block_cursor(cursor_column, line_rectangle.position);
         else
         {
             const uint8_t character_under_cursor = line->characters[offset.column + cursor.column];
             if (character_under_cursor == ' ' || character_under_cursor == '\t')
-            {
-                set_render_draw_color(background_colors[Font_Color_selected]);
-                SDL_RenderFillRect(renderer, &(SDL_Rect)
-                {
-                    .x = line_rectangle.position.x + FONT_WIDTH * cursor_column,
-                    .y = line_rectangle.position.y,
-                    .w = FONT_WIDTH,
-                    .h = FONT_HEIGHT
-                });
-            }
+                render_block_cursor(cursor_column, line_rectangle.position);
             else
                 render_string(&line->characters[offset.column + cursor.column], 1, &cursor_column, Font_Color_selected, line_rectangle);
         }

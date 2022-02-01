@@ -8,70 +8,78 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 Editor editor =
 {
-    .mode = Mode_normal,
-    .width = FONT_WIDTH * 80,
-    .height = FONT_HEIGHT * 24,
+    .mode           = Mode_normal,
+    .width          = FONT_WIDTH * 80,
+    .height         = FONT_HEIGHT * 24,
     .refresh_needed = true
 };
 
 static bool close_requested;
-
-static void handle_window_event(const SDL_WindowEvent* const window)
-{
-    switch (window->event)
-    {
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-            editor.width = (uint16_t)window->data1;
-            editor.height = (uint16_t)window->data2;
-            measure_tabs();
-            break;
-
-        case SDL_WINDOWEVENT_EXPOSED:
-        case SDL_WINDOWEVENT_RESTORED:
-            editor.refresh_needed = true;
-            break;
-
-        case SDL_WINDOWEVENT_CLOSE:
-            close_requested = true;
-            break;
-
-        default:
-            break;
-    }
-}
-
 static void handle_event(const SDL_Event* const event)
 {
+    static bool ctrl = false;
     switch (event->type)
     {
         case SDL_WINDOWEVENT:
-            handle_window_event(&event->window);
-            break;
+            switch (event->window.event)
+            {
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    editor.width  = (uint16_t)event->window.data1;
+                    editor.height = (uint16_t)event->window.data2;
+                    measure_tabs();
+                    break;
 
-        case SDL_KEYDOWN:
-            key_down_in_current_mode(&event->key);
-            if (SDL_ShowCursor(SDL_DISABLE) == -1)
-                SDL_Log("Could not disable cursor: %s\n", SDL_GetError());
+                case SDL_WINDOWEVENT_EXPOSED:
+                case SDL_WINDOWEVENT_RESTORED:
+                    editor.refresh_needed = true;
+                    break;
+
+                case SDL_WINDOWEVENT_CLOSE:
+                    close_requested = true;
+                    break;
+            }
 
             break;
 
         case SDL_TEXTINPUT:
-            input_character_in_current_mode(event->text.text[0]);
+        {
+            // Using SDL_TEXTINPUT just gives me the right character.
+            // I don't have to deal with shift + lower case characters
+            // or scan codes. Very handy for keyboards like mine with QMK
+            // firmware that fires multiple codes at once to get 'å'.
+            char c = event->text.text[0];
+            if (c < 0 || c > '\x7F')
+                break;
+
+            interpret_character(c, ctrl);
             if (SDL_ShowCursor(SDL_DISABLE) == -1)
                 SDL_Log("Could not disable cursor: %s\n", SDL_GetError());
 
             break;
+        }
 
+        case SDL_KEYDOWN:
+        {
+            ctrl = event->key.keysym.mod & KMOD_CTRL;
+            char c = (char)event->key.keysym.sym;
+            if (c > -1 && c < ' ' || c == '\x7F')
+                interpret_character(c, ctrl);
+
+            if (SDL_ShowCursor(SDL_DISABLE) == -1)
+                SDL_Log("Could not disable cursor: %s\n", SDL_GetError());
+
+            break;
+        }
+        
         case SDL_MOUSEMOTION:
             if (SDL_ShowCursor(SDL_ENABLE) == -1)
                 SDL_Log("Could not enable cursor: %s\n", SDL_GetError());
 
-            break;
-
-        default:
             break;
     }
 }
@@ -117,30 +125,15 @@ void show_message(const char* message)
     SDL_Log(message);
 }
 
-// TODO: Make it printf style so I can append SDL_GetError().
-void show_initialization_error_message(const char* const message)
+void show_initialization_error_message(const char* format, ...)
 {
-    // The nice thing about using SDL_ShowMessageBox is that
-    // it works even before SDL_Init is called. Perfect if 
-    // the renderer or something can't be created.
+    char message[1000];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(message, sizeof(message), format, args);
+    va_end(args);
 
-    const SDL_MessageBoxButtonData buttons[] = 
-    {
-        { 0, 0, "Ok" },
-    };
-
-    const SDL_MessageBoxData messageboxdata = 
-    {
-        .flags = SDL_MESSAGEBOX_ERROR,
-        .window = NULL,
-        .title = "Could not initialize Moss!",
-        .message = message,
-        .numbuttons = 1,
-        .buttons = buttons,
-        .colorScheme = NULL
-    };
-
-    SDL_ShowMessageBox(&messageboxdata, &(int) { 0 });
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could not initialize Moss!", message, NULL);
 }
 
 int main(int argc, char *argv[])
