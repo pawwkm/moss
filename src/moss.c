@@ -1,9 +1,4 @@
 #include "moss.h"
-#include "buffers.h"
-#include "modes.h"
-#include "renderer.h"
-#include "tabs.h"
-#include "SDL.h"
 
 #include <stdlib.h>
 #include <string.h>

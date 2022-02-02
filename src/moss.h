@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "SDL.h"
+
 #define FONT_WIDTH 6
 #define FONT_HEIGHT 13
 #define SPACES_PER_TAB 4
@@ -176,6 +178,58 @@ void set_editor_title(char* path, size_t path_length);
 void show_message(const char* message);
 
 void show_initialization_error_message(const char* message, ...);
+
+void interpret_character(char character, bool ctrl);
+
+char* read_file(char* path, size_t* characters_length);
+
+// TABS
+void move_active_view_to_the_left(void);
+void move_active_view_to_the_right(void);
+void move_active_tab_to_the_left(void);
+void move_active_tab_to_the_right(void);
+
+void put_active_view_in_new_tab_to_the_left(void);
+void put_active_view_in_new_tab_to_the_right(void);
+void put_active_view_in_tab_to_the_left(void);
+void put_active_view_in_tab_to_the_right(void);
+
+void activate_left_hand_side_view(void);
+void activate_right_hand_side_view(void);
+
+void activate_left_hand_side_tab(void);
+void activate_right_hand_side_tab(void);
+
+void close_active_tab(void);
+
+void open_buffer_in_active_tab(char* path, uint16_t path_length);
+
+void measure_tabs(void);
+
+View* find_active_editor_view(void);
+View* find_active_tab_view(const Tab* tab);
+
+bool go_to(View* view, Rectangle view_rectangle, bool use_preferred_column, Location absolute_location);
+
+// Renderer
+void render_editor(void);
+
+void initialize_renderer(SDL_Window* window);
+void uninitialize_renderer(void);
+
+// Buffers
+Line* add_line(Buffer* buffer);
+Token* add_token(Line* line);
+
+Buffer* buffer_handle_to_pointer(Buffer_Handle handle);
+
+bool open_buffer(char* path, uint16_t path_length, Buffer_Handle* handle);
+
+void flush_buffer(Buffer_Handle handle);
+
+bool has_unflushed_changes(Buffer_Handle handle);
+
+void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment);
 
 // ASCII
 bool is_space(char c);

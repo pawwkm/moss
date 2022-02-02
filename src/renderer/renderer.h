@@ -1,10 +1,6 @@
 #pragma once
 
 #include "../moss.h"
-#include "../renderer.h"
-#include "../buffers.h"
-#include "../tabs.h"
-#include "SDL.h"
 
 typedef enum
 {

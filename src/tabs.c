@@ -1,5 +1,4 @@
-#include "tabs.h"
-#include "buffers.h"
+#include "moss.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,18 +17,18 @@ static Tab* add_tab(void)
     return &editor.tabs[editor.tabs_length++];
 }
 
-void set_editor_active_tab(const uint8_t tab_index)
+static void set_editor_title_to_buffer_path(const Buffer_Handle handle)
+{
+    const Buffer* const buffer = buffer_handle_to_pointer(handle);
+    set_editor_title(buffer->path, buffer->path_length);
+}
+
+static void set_editor_active_tab(const uint8_t tab_index)
 {
     editor.active_tab_index = tab_index;
     
     const Tab* const tab = &editor.tabs[tab_index];
     set_editor_title_to_buffer_path(tab->views[tab->active_view_index].buffer);
-}
-
-void set_editor_title_to_buffer_path(const Buffer_Handle handle)
-{
-    const Buffer* const buffer = buffer_handle_to_pointer(handle);
-    set_editor_title(buffer->path, buffer->path_length);
 }
 
 void measure_tabs(void)
@@ -80,18 +79,44 @@ static void insert_tab(const uint8_t index)
     editor.tabs[index] = (Tab){ 0 };
 }
 
-uint8_t insert_tab_before_active_tab(void)
+static uint8_t insert_tab_before_active_tab(void)
 {
     insert_tab(editor.active_tab_index);
 
     return editor.active_tab_index;
 }
 
-uint8_t insert_tab_after_active_tab(void)
+static uint8_t insert_tab_after_active_tab(void)
 {
     insert_tab(editor.active_tab_index + 1);
 
     return editor.active_tab_index + 1;
+}
+
+static uint8_t add_view(const uint8_t tab_index)
+{
+    Tab* const tab = &editor.tabs[tab_index];
+    if (tab->views_length == tab->views_capacity)
+    {
+        tab->views_capacity = tab->views_capacity ? tab->views_capacity * 2 : 4;
+        tab->views = realloc(tab->views, sizeof(tab->views[0]) * tab->views_capacity);
+
+        memset(tab->views + tab->views_length, 0, sizeof(tab->views[0]) * (tab->views_capacity - tab->views_length));
+    }
+
+    return tab->views_length++;
+}
+
+static void remove_view(const uint8_t tab_index, uint8_t view_index)
+{
+    Tab* const tab = &editor.tabs[tab_index];
+    while (view_index < tab->views_length - 1)
+    {
+        tab->views[view_index] = tab->views[view_index + 1];
+        view_index++;
+    }
+
+    tab->views[--tab->views_length] = (View){ 0 };
 }
 
 void open_buffer_in_active_tab(char* const path, const uint16_t path_length)
@@ -114,32 +139,6 @@ void open_buffer_in_active_tab(char* const path, const uint16_t path_length)
         show_message("Could not open file.");
         remove_view(editor.active_tab_index, view_index);
     }
-}
-
-uint8_t add_view(const uint8_t tab_index)
-{
-    Tab* const tab = &editor.tabs[tab_index];
-    if (tab->views_length == tab->views_capacity)
-    {
-        tab->views_capacity = tab->views_capacity ? tab->views_capacity * 2 : 4;
-        tab->views = realloc(tab->views, sizeof(tab->views[0]) * tab->views_capacity);
-
-        memset(tab->views + tab->views_length, 0, sizeof(tab->views[0]) * (tab->views_capacity - tab->views_length));
-    }
-
-    return tab->views_length++;
-}
-
-void remove_view(const uint8_t tab_index, uint8_t view_index)
-{
-    Tab* const tab = &editor.tabs[tab_index];
-    while (view_index < tab->views_length - 1)
-    {
-        tab->views[view_index] = tab->views[view_index + 1];
-        view_index++;
-    }
-
-    tab->views[--tab->views_length] = (View){ 0 };
 }
 
 View* find_active_editor_view(void)
@@ -379,4 +378,168 @@ bool go_to(View* const view, const Rectangle view_rectangle, const bool use_pref
     }
 
     return vertical_movement || horizontal_movement;
+}
+
+void move_active_view_to_the_left(void)
+{
+
+    if (editor.tabs_length < 2 || editor.active_tab_index == 0)
+        return;
+
+    // Draw the rest of the owl.
+    editor.refresh_needed = true;
+}
+
+void move_active_view_to_the_right(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    Tab* const tab = &editor.tabs[editor.active_tab_index];
+    if (tab->active_view_index == tab->views_length - 1)
+        return;
+
+    editor.refresh_needed = true;
+}
+
+void move_active_tab_to_the_left(void)
+{
+    if (editor.tabs_length < 2 || editor.active_tab_index == 0)
+        return;
+
+    const Tab temp = editor.tabs[editor.active_tab_index - 1];
+    editor.tabs[editor.active_tab_index - 1] = editor.tabs[editor.active_tab_index];
+    editor.tabs[editor.active_tab_index] = temp;
+    measure_tabs();
+
+    set_editor_active_tab(editor.active_tab_index - 1);
+    editor.refresh_needed = true;
+}
+
+void move_active_tab_to_the_right(void)
+{
+    if (editor.tabs_length < 2 || editor.active_tab_index == editor.tabs_length - 1)
+        return;
+
+    const Tab temp = editor.tabs[editor.active_tab_index + 1];
+    editor.tabs[editor.active_tab_index + 1] = editor.tabs[editor.active_tab_index];
+    editor.tabs[editor.active_tab_index] = temp;
+    measure_tabs();
+
+    set_editor_active_tab(editor.active_tab_index + 1);
+    editor.refresh_needed = true;
+}
+
+void put_active_view_in_new_tab_to_the_left(void)
+{
+    if (!editor.tabs_length)
+        return;
+    
+    if (editor.tabs[editor.active_tab_index].views_length == 1)
+        return;
+
+    const uint8_t new_tab_index = insert_tab_before_active_tab();
+    Tab* const restrict new_tab = &editor.tabs[new_tab_index];
+
+    Tab* const restrict active_tab = &editor.tabs[++editor.active_tab_index];
+
+    const uint8_t view_index_in_new_tab = add_view(new_tab_index);
+    new_tab->views[view_index_in_new_tab] = active_tab->views[active_tab->active_view_index];
+
+    remove_view(editor.active_tab_index, active_tab->active_view_index);
+    set_editor_active_tab(active_tab->active_view_index);
+
+    measure_tabs();
+    editor.refresh_needed = true;
+}
+
+void put_active_view_in_new_tab_to_the_right(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    Tab* const restrict active_tab = &editor.tabs[editor.active_tab_index];
+    if (active_tab->views_length == 1)
+        return;
+
+    const uint8_t new_tab_index = insert_tab_after_active_tab();
+    Tab* const restrict new_tab = &editor.tabs[new_tab_index];
+
+    const uint8_t view_index_in_new_tab = add_view(new_tab_index);
+    new_tab->views[view_index_in_new_tab] = active_tab->views[active_tab->active_view_index];
+
+    remove_view(editor.active_tab_index, active_tab->active_view_index);
+    if (active_tab->active_view_index)
+        active_tab->active_view_index--;
+
+    set_editor_active_tab(active_tab->active_view_index);
+
+    measure_tabs();
+    editor.refresh_needed = true;
+}
+
+void put_active_view_in_tab_to_the_left(void)
+{
+    if (editor.tabs_length < 2 || editor.active_tab_index == editor.tabs_length - 1)
+        return;
+
+    editor.refresh_needed = true;
+}
+
+void put_active_view_in_tab_to_the_right(void)
+{
+    if (editor.tabs_length < 2 || editor.active_tab_index == 0)
+        return;
+
+    editor.refresh_needed = true;
+}
+
+void activate_left_hand_side_view(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    Tab* const active_tab = &editor.tabs[editor.active_tab_index];
+    if (!active_tab->active_view_index)
+        return;
+
+    set_editor_title_to_buffer_path(active_tab->views[--active_tab->active_view_index].buffer);
+    editor.refresh_needed = true;
+}
+
+void activate_right_hand_side_view(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    Tab* const active_tab = &editor.tabs[editor.active_tab_index];
+    if (active_tab->active_view_index == active_tab->views_length - 1)
+        return;
+
+    set_editor_title_to_buffer_path(active_tab->views[++active_tab->active_view_index].buffer);
+    editor.refresh_needed = true;
+}
+
+void activate_left_hand_side_tab(void)
+{
+    if (editor.tabs_length < 2 || editor.active_tab_index == 0)
+        return;
+
+    set_editor_active_tab(--editor.active_tab_index);
+    editor.refresh_needed = true;
+}
+
+void activate_right_hand_side_tab(void)
+{
+    if (editor.tabs_length < 2 || editor.active_tab_index == editor.tabs_length - 1)
+        return;
+
+    set_editor_active_tab(++editor.active_tab_index);
+    editor.refresh_needed = true;
+}
+
+void close_active_tab(void)
+{
+    // TODO: Check that all buffers that has a single reference has 
+    // no unsaved changes.
 }

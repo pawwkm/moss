@@ -1,6 +1,109 @@
-#include "modes.h"
+#include "moss.h"
 
 #include <assert.h>
+
+static void enter_insert_mode(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    SDL_Log("Mode_insert");
+    editor.mode = Mode_insert;
+    editor.refresh_needed = true;
+}
+
+static void exit_insert_mode(void)
+{
+    SDL_Log("Mode_normal");
+    editor.mode = Mode_normal;
+    editor.refresh_needed = true;
+}
+
+static void enter_visual_mode(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    SDL_Log("Mode_visual");
+    editor.mode = Mode_visual;
+    editor.refresh_needed = true;
+}
+
+static void exit_visual_mode(void)
+{
+    SDL_Log("Mode_normal");
+    editor.mode = Mode_normal;
+    editor.refresh_needed = true;
+}
+
+static void enter_tab_mode(void)
+{
+    if (!editor.tabs_length)
+        return;
+
+    SDL_Log("Mode_tab");
+    editor.mode = Mode_tab;
+    editor.refresh_needed = true;
+}
+
+static void exit_tab_mode(void)
+{
+    SDL_Log("Mode_normal");
+    editor.mode = Mode_normal;
+    editor.refresh_needed = true;
+}
+
+static void insert_character_into_command(const char character)
+{
+    if (editor.command_length == editor.command_capacity)
+    {
+        editor.command_capacity = editor.command_capacity ? editor.command_capacity * 2 : 4;
+        editor.command = realloc(editor.command, sizeof(editor.command[0]) * editor.command_capacity);
+    }
+
+    editor.command[editor.command_length++] = character;
+    editor.command_cursor++;
+
+    editor.refresh_needed = true;
+}
+
+static void clear_command(void)
+{
+    if (editor.command_length)
+    {
+        editor.command_cursor = 0;
+        editor.command_length = 0;
+        editor.refresh_needed = true;
+    }
+}
+
+static void delete_current_character_in_command(void)
+{
+    if (editor.command_cursor == editor.command_length)
+        return;
+
+    for (uint16_t i = editor.command_cursor; i < editor.command_length - 1; i++)
+        editor.command[i] = editor.command[i + 1];
+
+    editor.command_length--;
+    editor.command_cursor--;
+
+    editor.refresh_needed = true;
+}
+
+static void delete_previous_character_in_command(void)
+{
+    if (!editor.command_cursor)
+        return;
+
+    for (uint16_t i = editor.command_cursor; i < editor.command_length; i++)
+        editor.command[i - 1] = editor.command[i];
+
+    editor.command_length--;
+    editor.command_cursor--;
+
+    editor.refresh_needed = true;
+}
 
 static bool character_is_1_of(char c, const char* string)
 {
@@ -423,6 +526,10 @@ void interpret_character(char character, bool ctrl)
                     case 'O':
                         assert(false);
                         break;
+
+                    case 'v':
+                        enter_visual_mode();
+                        break;
                 }
             }
 
@@ -638,5 +745,15 @@ void interpret_character(char character, bool ctrl)
 
             break;
         }
+
+        case Mode_visual:
+        {
+            switch (character)
+            {
+                case '\x1B':
+                    exit_visual_mode();
+                    break;
+            }
+        } 
     }
 }

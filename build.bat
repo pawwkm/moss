@@ -6,7 +6,6 @@ if not exist "bin\obj\" mkdir "bin\obj"
 
 set sources= src/*.c ^
              src/buffers/*.c ^
-             src/modes/*.c ^
              src/renderer/*.c
              
 set libraries= "%cd%\windows\SDL2-2.0.16\lib\x64\SDL2.lib" ^
