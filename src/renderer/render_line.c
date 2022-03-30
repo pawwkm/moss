@@ -72,7 +72,7 @@ void render_line(const Line* line, const Location offset, const Location cursor,
     uint16_t cursor_column = logical_columns_to_rendered_columns(line, offset.column, offset.column + cursor.column);
     if (editor.mode == Mode_normal)
     {
-        if (offset.column + cursor.column == INDEX_OF_CHARACTER_APPEND(line->characters_length))
+        if (offset.column + cursor.column == index_of_character_append(line))
             render_block_cursor(cursor_column, line_rectangle.position);
         else
         {

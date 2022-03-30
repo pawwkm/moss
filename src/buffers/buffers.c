@@ -1,7 +1,7 @@
 #include "buffers.h"
-#include "SDL.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 Line* add_line(Buffer* const buffer)
 {
@@ -172,8 +172,8 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
     buffer->path = path;
     buffer->path_length = path_length;
     buffer->references = 1;
-    buffer->last_flushed_change = -1;
-    buffer->current_change = -1;
+    buffer->last_flushed_change = 0;
+    buffer->current_change = 0;
 
     free(file);
 
@@ -234,5 +234,24 @@ bool has_unflushed_changes(Buffer_Handle handle)
 {
     const Buffer* buffer = buffer_handle_to_pointer(handle);
 
-    return buffer->last_flushed_change != buffer->current_change;
+    return buffer->changes_length && buffer->last_flushed_change != buffer->current_change;
 }
+
+// The cursor can be placed after the last character in a line which means that
+// characters are appended, not inserted. But that also means that if the editor
+// tries to read what is under the cursor it may overrun the line buffer by 1
+//
+// That is not really communicated well by using -1 in some places and not in 
+// others.
+uint16_t index_of_last_character(const Line* line)
+{
+    assert(line->characters_length);
+
+    return line->characters_length - 1;
+}
+
+uint16_t index_of_character_append(const Line* line)
+{
+    return line->characters_length;
+}
+

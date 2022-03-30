@@ -18,6 +18,7 @@ set defines= -D _CRT_SECURE_NO_WARNINGS
 
 set compiler_options= /std:c17 ^
                       /Fobin\obj\  ^
+                      /MP ^
                       /Zi ^
                       /W4 ^
                       /WX ^

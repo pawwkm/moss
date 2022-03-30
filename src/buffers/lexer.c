@@ -6,6 +6,8 @@
 
 void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment)
 {
+    line->tokens_length = 0;
+
     switch (language)
     {
         case Language_none:

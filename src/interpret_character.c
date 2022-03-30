@@ -136,28 +136,40 @@ static Location motion_to_location(char motion, uint16_t repetition, Buffer* buf
             break;
 
         case 'j':
+        {
             if ((uint32_t)view->offset.line + (uint32_t)view->cursor.line + (uint32_t)repetition > buffer->lines_length)
                 location.line = buffer->lines_length - 1;
             else
                 location.line = view->offset.line + view->cursor.line + repetition;
-            
+
+            Line* line = &buffer->lines[location.line];
             location.column = view->offset.column + view->cursor.column;
+            if (location.column > index_of_character_append(line))
+                location.column = index_of_character_append(line);
+
             break;
+        }
 
         case 'k':
+        {
             if ((int32_t)view->offset.line + (int32_t)view->cursor.line - (int32_t)repetition < 0)
                 location.line = 0;
             else
                 location.line = view->offset.line + view->cursor.line - repetition;
-            
+
+            Line* line = &buffer->lines[location.line];
             location.column = view->offset.column + view->cursor.column;
+            if (location.column > index_of_character_append(line))
+                location.column = index_of_character_append(line);
+
             break;
+        }
 
         case 'l':
         {
             Line* line = &buffer->lines[location.line];
-            if ((uint32_t)view->offset.column + (uint32_t)view->cursor.column + (uint32_t)repetition > line->characters_length)
-                location.column = line->characters_length;
+            if ((uint32_t)view->offset.column + (uint32_t)view->cursor.column + (uint32_t)repetition > index_of_character_append(line))
+                location.column = index_of_character_append(line);
             else
                 location.column = view->offset.column + view->cursor.column + repetition;
 
@@ -168,7 +180,7 @@ static Location motion_to_location(char motion, uint16_t repetition, Buffer* buf
         case '^':
         {
             Line* line = &buffer->lines[location.line];
-            while (location.column < line->characters_length && is_space(line->characters[location.column]))
+            while (location.column < index_of_character_append(line) && is_space(line->characters[location.column]))
                 location.column++;
 
             break;
@@ -280,12 +292,12 @@ static void object_to_span(char object, char modifier, Location* start, Location
                 break;
         }
 
-        // Look backwards.
+        // Look to the left.
         while (true)
         {
             // Doing this check even when the i modifier is present handles the 
             // case where the cursor is on the right character from the start.
-            if (INDEX_OF_LAST_CHARACTER(buffer->lines[t_start.line].characters_length) >= t_start.column &&
+            if (index_of_last_character(&buffer->lines[t_start.line]) >= t_start.column &&
                 buffer->lines[t_start.line].characters[t_start.column] == left)
                 break;
 
@@ -302,7 +314,7 @@ static void object_to_span(char object, char modifier, Location* start, Location
                 else if (t_start.line)
                 {
                     Line* line = &buffer->lines[t_start.line - 1];
-                    if (line->characters_length && line->characters[INDEX_OF_LAST_CHARACTER(line->characters_length)] == left)
+                    if (line->characters_length && line->characters[index_of_last_character(line)] == left)
                         break;
                 }
                 else
@@ -316,7 +328,7 @@ static void object_to_span(char object, char modifier, Location* start, Location
             else
             {
                 t_start.line--;
-                t_start.column = INDEX_OF_CHARACTER_APPEND(buffer->lines[t_start.line].characters_length);
+                t_start.column = index_of_character_append(&buffer->lines[t_start.line]);
             }
         }
             
@@ -328,7 +340,7 @@ static void object_to_span(char object, char modifier, Location* start, Location
             else
             {
                 t_start.line--;
-                t_start.column = INDEX_OF_CHARACTER_APPEND(buffer->lines[t_start.line].characters_length);
+                t_start.column = index_of_character_append(&buffer->lines[t_start.line]);
             }
 
             if (t_start.line || t_start.column)
@@ -343,7 +355,7 @@ static void object_to_span(char object, char modifier, Location* start, Location
                     else
                     {
                         t_start.line--;
-                        t_start.column = INDEX_OF_CHARACTER_APPEND(buffer->lines[t_start.line].characters_length);
+                        t_start.column = index_of_character_append(&buffer->lines[t_start.line]);
 
                         line = &buffer->lines[t_start.line];
                     }
@@ -351,18 +363,18 @@ static void object_to_span(char object, char modifier, Location* start, Location
             }
         }
 
-        // Look forward.
+        // Look to the right.
         while (true)
         {
             // Doing this check even when the i modifier is present handles the 
             // case where the cursor is on the right character from the start.
-            if (INDEX_OF_LAST_CHARACTER(buffer->lines[t_end.line].characters_length) >= t_end.column &&
+            if (index_of_last_character(&buffer->lines[t_end.line]) >= t_end.column &&
                 buffer->lines[t_end.line].characters[t_end.column] == right)
                 break;
 
             if (modifier == 'i')
             {
-                if (INDEX_OF_LAST_CHARACTER(buffer->lines[t_end.line].characters_length) > t_end.column)
+                if (index_of_last_character(&buffer->lines[t_end.line]) > t_end.column)
                 {
                     if (buffer->lines[t_end.line].characters[t_end.column + 1] == right)
                         break;
@@ -377,7 +389,7 @@ static void object_to_span(char object, char modifier, Location* start, Location
                     return;
             }
 
-            if (INDEX_OF_CHARACTER_APPEND(buffer->lines[t_end.line].characters_length) == t_end.column)
+            if (index_of_character_append(&buffer->lines[t_end.line]) == t_end.column)
             {
                 if (t_end.line + 1 == buffer->lines_length)
                     return;
@@ -394,7 +406,7 @@ static void object_to_span(char object, char modifier, Location* start, Location
         if (modifier == 'a')
         {
             // Jump over 'right'.
-            if (INDEX_OF_LAST_CHARACTER(buffer->lines[t_end.line].characters_length) == t_end.column)
+            if (index_of_last_character(&buffer->lines[t_end.line]) == t_end.column)
             {
                 if (t_end.line + 1 <= buffer->lines_length)
                 {
@@ -405,13 +417,13 @@ static void object_to_span(char object, char modifier, Location* start, Location
             else
                 t_end.column++;
 
-            while (t_end.line < buffer->lines_length || t_end.column < INDEX_OF_CHARACTER_APPEND(buffer->lines[t_end.line].characters_length))
+            while (t_end.line < buffer->lines_length || t_end.column < index_of_character_append(&buffer->lines[t_end.line]))
             {
                 Line* line = &buffer->lines[t_end.line];
                 if (line->characters_length && !is_space(line->characters[t_end.column]))
                     break;
 
-                if (INDEX_OF_CHARACTER_APPEND(line->characters_length) == t_end.column)
+                if (index_of_character_append(line) == t_end.column)
                 {
                     if (t_end.line + 1 == buffer->lines_length)
                         break;
@@ -530,6 +542,14 @@ void interpret_character(char character, bool ctrl)
                     case 'v':
                         enter_visual_mode();
                         break;
+                    
+                    case 'u':
+                        undo_changes();
+                        return;
+
+                    case 'r':
+                        do_changes();
+                        return;
                 }
             }
 
@@ -644,24 +664,59 @@ void interpret_character(char character, bool ctrl)
                 object_to_span(object, modifier, &start, &end, buffer, view);
             else if (motion)
             {
+                start.line = view->offset.line + view->cursor.line;
+                start.column = view->offset.column + view->cursor.column;
+
                 end = motion_to_location(motion, repetition, buffer, view);
                 Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
 
                 editor.refresh_needed = go_to(view, rectangle, use_preferred_column, end);
             }
 
-            if (operator == 'c' || operator == 'd')
-            {        
-                // TODO: Place change break at the current location if 
-                // there are no changes in the buffer.
-                while (start.line != end.line || start.column != end.column)
+            if (start.line > end.line || start.line == end.line && start.column > end.column)
+            {
+                Location temp = start;
+                start = end;
+                end = temp;
+            }
+
+            if ((start.line != end.line || start.column != end.column) && (operator == 'c' || operator == 'd'))
+            {
+                Change change =
                 {
-                    assert(false);
-                    break;
+                    .tag = Change_Tag_break,
+                    .cursor = start
+                };
+
+                add_change(buffer, change);
+                Location current = start;
+
+                while (current.line != end.line || current.column != end.column)
+                {
+                    Line* line = &buffer->lines[current.line];
+                    if (index_of_character_append(line) == current.column)
+                    {
+                        change.tag = Change_Tag_remove_line;
+
+                        current.line++;
+                        current.column = 0;
+                    }
+                    else
+                    {
+                        change.tag = Change_Tag_remove_character;
+                        change.character = line->characters[current.column];
+
+                        current.column++;
+                    }
+
+                    add_change(buffer, change);
                 }
-                
-                // place break by the end location in the buffer's changes.
-                // assert that the cursor is a the break location.
+
+                change.tag = Change_Tag_break;
+                change.cursor = start;
+
+                add_change(buffer, change);
+                do_changes();
             }
             else if (operator == 'y')
             {

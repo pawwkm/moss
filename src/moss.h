@@ -57,15 +57,6 @@ typedef struct
     uint16_t tokens_capacity;
 } Line;
 
-// The cursor can be placed after the last character in a line which means that
-// characters are appended, not inserted. But that also means that if the editor
-// tries to read what is under the cursor it may overrun the line buffer by 1
-//
-// That is not really communicated well by using -1 in some places and not in 
-// others.
-#define INDEX_OF_LAST_CHARACTER(CHARACTERS_LENGTH) (CHARACTERS_LENGTH - 1)
-#define INDEX_OF_CHARACTER_APPEND(CHARACTERS_LENGTH) (CHARACTERS_LENGTH)
-
 typedef struct
 {
     uint16_t line;
@@ -113,8 +104,8 @@ typedef struct
     Change* changes;
     uint32_t changes_length;
     uint32_t changes_capacity;
-    int32_t last_flushed_change;
-    int32_t current_change;
+    uint32_t last_flushed_change;
+    uint32_t current_change;
 
     Language language;
 
@@ -230,6 +221,13 @@ void flush_buffer(Buffer_Handle handle);
 bool has_unflushed_changes(Buffer_Handle handle);
 
 void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment);
+
+void add_change(Buffer* buffer, Change change);
+void do_changes(void);
+void undo_changes(void);
+
+uint16_t index_of_last_character(const Line* line);
+uint16_t index_of_character_append(const Line* line);
 
 // ASCII
 bool is_space(char c);
