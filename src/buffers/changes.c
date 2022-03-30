@@ -37,8 +37,10 @@ void do_changes(void)
     View* view = find_active_tab_view(tab);
     Buffer* buffer = buffer_handle_to_pointer(view->buffer);
     
-    if (buffer->changes_length == buffer->current_change)
+    if (buffer->changes_length - 1 == buffer->current_change)
         return;
+    else if (buffer->current_change)
+        buffer->current_change++;
 
     Change change = buffer->changes[buffer->current_change++];
     assert(change.tag == Change_Tag_break);
@@ -91,6 +93,8 @@ void undo_changes(void)
 
     if (!buffer->current_change)
         return;
+    else if (buffer->changes_length - 1 != buffer->current_change)
+        buffer->current_change--;
 
     Change change;
     do
