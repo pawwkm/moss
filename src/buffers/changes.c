@@ -14,23 +14,6 @@ void add_change(Buffer* buffer, Change change)
     buffer->changes[buffer->changes_length++] = change;
 }
 
-static void partial_lex(Buffer* buffer, uint16_t from, uint16_t to)
-{
-    if (to < from)
-    {
-        uint16_t temp = to;
-        to = from;
-        from = temp;
-    }
-
-    bool continue_multiline_comment = false;
-    for (uint16_t i = from; i <= to; i++)
-    {
-        assert(i < buffer->lines_length);
-        lexical_analyze(buffer->language, &buffer->lines[i], &continue_multiline_comment);
-    }
-}
-
 void do_changes(void)
 {
     Tab* tab = &editor.tabs[editor.active_tab_index];
@@ -56,6 +39,7 @@ void do_changes(void)
             assert(false && "Change_Tag_insert_character not supported.");
         else if (change.tag == Change_Tag_remove_character)
         {
+            // TODO: Count consecutive Change_Tag_remove_character and remove them in one go.
             Line* line = &buffer->lines[location.line];
             assert(line->characters_length);
 
@@ -68,9 +52,35 @@ void do_changes(void)
         else if (change.tag == Change_Tag_insert_line)
             assert(false && "Change_Tag_insert_line not supported.");
         else if (change.tag == Change_Tag_remove_line)
+        {
+            Line* line = &buffer->lines[location.line];
+            assert(!line->characters_length);
             assert(false && "Change_Tag_remove_line not supported.");
+
+            remove_lines(buffer, location.line, 1);
+            // TODO: Count consecutive Change_Tag_remove_line and remove them in one go.
+        }
         else if (change.tag == Change_Tag_merge_line)
-            assert(false && "Change_Tag_merge_line not supported.");
+        {
+            Line* current_line = &buffer->lines[location.line];
+            assert(current_line->characters_length);
+
+            Line* next_line = &buffer->lines[location.line + 1];
+            uint16_t combined_characters_length = current_line->characters_length + next_line->characters_length;
+
+            if (current_line->characters_capacity < combined_characters_length)
+            {
+                while (current_line->characters_capacity < combined_characters_length)
+                    current_line->characters_capacity = current_line->characters_capacity ? current_line->characters_capacity * 2 : 4;
+
+                current_line->characters = realloc(current_line->characters, current_line->characters_capacity);
+            }
+
+            memcpy(&current_line->characters[current_line->characters_length], next_line->characters, next_line->characters_length);
+            current_line->characters_length = combined_characters_length;
+
+            remove_lines(buffer, location.line + 1, 1);
+        }
         else if (change.tag == Change_Tag_split_line)
             assert(false && "Change_Tag_split_line not supported.");
         else
@@ -80,7 +90,7 @@ void do_changes(void)
     }
 
     go_to(view, tab->rectangle, false, start);
-    partial_lex(buffer, start.line, change.cursor.line);
+    lexical_analyze_lines(buffer, start.line, change.cursor.line);
 
     editor.refresh_needed = true;
 }
@@ -139,7 +149,7 @@ void undo_changes(void)
     }
 
     go_to(view, tab->rectangle, false, change.cursor);
-    partial_lex(buffer, start.line, change.cursor.line);
+    lexical_analyze_lines(buffer, start.line, change.cursor.line);
 
     editor.refresh_needed = true;
 }

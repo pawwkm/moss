@@ -220,7 +220,7 @@ void flush_buffer(Buffer_Handle handle);
 
 bool has_unflushed_changes(Buffer_Handle handle);
 
-void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment);
+void lexical_analyze_lines(Buffer* buffer, uint16_t from, uint16_t to);
 
 void add_change(Buffer* buffer, Change change);
 void do_changes(void);

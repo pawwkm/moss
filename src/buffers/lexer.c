@@ -3,8 +3,9 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
-void lexical_analyze(Language language, Line* line, bool* continue_multiline_comment)
+static void lexical_analyze_line(Language language, Line* line, bool* continue_multiline_comment)
 {
     line->tokens_length = 0;
 
@@ -24,5 +25,22 @@ void lexical_analyze(Language language, Line* line, bool* continue_multiline_com
         case Language_owen:
             lexical_analyze_owen(line);
             break;
+    }
+}
+
+void lexical_analyze_lines(Buffer* buffer, uint16_t from, uint16_t to)
+{
+    if (to < from)
+    {
+        uint16_t temp = to;
+        to = from;
+        from = temp;
+    }
+
+    bool continue_multiline_comment = false;
+    for (uint16_t i = from; i <= to; i++)
+    {
+        assert(i < buffer->lines_length);
+        lexical_analyze_line(buffer->language, &buffer->lines[i], &continue_multiline_comment);
     }
 }

@@ -16,6 +16,15 @@ Line* add_line(Buffer* const buffer)
     return &buffer->lines[buffer->lines_length++];
 }
 
+void remove_lines(Buffer* buffer, uint16_t index, uint16_t amount)
+{
+    for (uint16_t i = 0; i < amount; i++)
+        line_free(&buffer->lines[index + i]);
+
+    memmove(&buffer->lines[index], &buffer->lines[index + amount], sizeof(buffer->lines[0]) * (buffer->lines_length - index));
+    buffer->lines_length -= amount;
+}
+
 Token* add_token(Line* const line)
 {
     if (line->tokens_length == line->tokens_capacity)
@@ -165,9 +174,7 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
         }
     }
 
-    bool continue_multiline_comment = false;
-    for (uint16_t i = 0; i < buffer->lines_length; i++)
-        lexical_analyze(buffer->language, &buffer->lines[i], &continue_multiline_comment);
+    lexical_analyze_lines(buffer, 0, buffer->lines_length - 1);
 
     buffer->path = path;
     buffer->path_length = path_length;
@@ -182,18 +189,14 @@ bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* co
 
 void close_buffer(Buffer_Handle handle)
 {
-    Buffer* const buffer = buffer_handle_to_pointer(handle);
+    Buffer* buffer = buffer_handle_to_pointer(handle);
     buffer->references--;
 
     if (!buffer->references)
     {
         free(buffer->path);
         for (uint16_t i = 0; i < buffer->lines_length; i++)
-        {
-            Line* const line = &buffer->lines[i];
-            free(line->tokens);
-            free(line->characters);
-        }
+            line_free(&buffer->lines[i]);
 
         memset(buffer, 0, sizeof(*buffer));
         if (handle.index == buffers_length)
