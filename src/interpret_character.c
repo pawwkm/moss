@@ -696,7 +696,7 @@ void interpret_character(char character, bool ctrl)
                     Line* line = &buffer->lines[current.line];
                     if (index_of_character_append(line) == current.column)
                     {
-                        if (current.line == start.line && start.column)
+                        if (start.column)
                             change.tag = Change_Tag_merge_line;
                         else
                             change.tag = Change_Tag_remove_line;

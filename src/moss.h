@@ -209,9 +209,6 @@ void initialize_renderer(SDL_Window* window);
 void uninitialize_renderer(void);
 
 // Buffers
-Line* add_line(Buffer* buffer);
-Token* add_token(Line* line);
-
 Buffer* buffer_handle_to_pointer(Buffer_Handle handle);
 
 bool open_buffer(char* path, uint16_t path_length, Buffer_Handle* handle);
@@ -219,8 +216,6 @@ bool open_buffer(char* path, uint16_t path_length, Buffer_Handle* handle);
 void flush_buffer(Buffer_Handle handle);
 
 bool has_unflushed_changes(Buffer_Handle handle);
-
-void lexical_analyze_lines(Buffer* buffer, uint16_t from, uint16_t to);
 
 void add_change(Buffer* buffer, Change change);
 void do_changes(void);

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-Line* add_line(Buffer* const buffer)
+Line* add_line(Buffer* buffer)
 {
     if (buffer->lines_length == buffer->lines_capacity)
     {
@@ -16,6 +16,25 @@ Line* add_line(Buffer* const buffer)
     return &buffer->lines[buffer->lines_length++];
 }
 
+Line* insert_line(Buffer* buffer, uint16_t index)
+{
+    if (buffer->lines_length == buffer->lines_capacity)
+    {
+        buffer->lines_capacity = buffer->lines_capacity ? buffer->lines_capacity * 2 : 4;
+        buffer->lines = realloc(buffer->lines, sizeof(buffer->lines[0]) * buffer->lines_capacity);
+
+        memset(buffer->lines + buffer->lines_length, 0, sizeof(buffer->lines[0]) * (buffer->lines_capacity - buffer->lines_length));
+    }
+
+    memmove(&buffer->lines[index + 1], &buffer->lines[index], sizeof(buffer->lines[0]) * (buffer->lines_length - index));
+    Line* inserted = &buffer->lines[index];
+    memset(inserted, 0, sizeof(inserted[0]));
+
+    buffer->lines_length++;
+
+    return inserted;
+}
+
 void remove_lines(Buffer* buffer, uint16_t index, uint16_t amount)
 {
     for (uint16_t i = 0; i < amount; i++)
@@ -25,7 +44,7 @@ void remove_lines(Buffer* buffer, uint16_t index, uint16_t amount)
     buffer->lines_length -= amount;
 }
 
-Token* add_token(Line* const line)
+Token* add_token(Line* line)
 {
     if (line->tokens_length == line->tokens_capacity)
     {
@@ -47,7 +66,7 @@ Buffer* buffer_handle_to_pointer(Buffer_Handle handle)
     return &buffers[handle.index];
 }
 
-bool open_buffer(char* const path, const uint16_t path_length, Buffer_Handle* const handle)
+bool open_buffer(char* const path, uint16_t path_length, Buffer_Handle* handle)
 {
     // Check if the utf8 is already open.
     for (uint8_t i = 0; i < buffers_length; i++)

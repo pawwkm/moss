@@ -43,20 +43,13 @@ void do_changes(void)
             Line* line = &buffer->lines[location.line];
             assert(line->characters_length);
 
-            memmove(&line->characters[location.column], &line->characters[location.column + 1], line->characters_length - location.column);
-            if (location.column == line->characters_length)
-                location.column++;
-
-            line->characters_length--;
+            remove_chars(line, location.column, 1);
         }
         else if (change.tag == Change_Tag_insert_line)
             assert(false && "Change_Tag_insert_line not supported.");
         else if (change.tag == Change_Tag_remove_line)
         {
-            Line* line = &buffer->lines[location.line];
-            assert(!line->characters_length);
-            assert(false && "Change_Tag_remove_line not supported.");
-
+            assert(!buffer->lines[location.line].characters_length);
             remove_lines(buffer, location.line, 1);
             // TODO: Count consecutive Change_Tag_remove_line and remove them in one go.
         }
@@ -119,6 +112,33 @@ void undo_changes(void)
     Location location = change.cursor;
 
     current_change++;
+
+    // TODO: This loop seems to be the same as in do_changes.
+    // So when I support all the tags supported, factor this 
+    // loop into a function:
+    // 
+    // void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
+    // {
+    //     static Change_Tag opposites[] = 
+    //     {
+    //         [Change_Tag_break]            = Change_Tag_break,
+    //         [Change_Tag_insert_character] = Change_Tag_remove_character,
+    //         [Change_Tag_remove_character] = Change_Tag_insert_character,
+    //         [Change_Tag_insert_line]      = Change_Tag_remove_line,
+    //         [Change_Tag_remove_line]      = Change_Tag_insert_line,
+    //         [Change_Tag_merge_line]       = Change_Tag_split_line,
+    //         [Change_Tag_split_line]       = Change_Tag_merge_line
+    //     };
+    // 
+    //     while (true)
+    //     {
+    //         change = buffer->changes[current_change];
+    //         if (is_undo)
+    //              change.tag = opposites[change.tag];
+    //        
+    //         // Have a single switch here...
+    //     }
+    // }
     while (true)
     {
         change = buffer->changes[current_change];
@@ -129,17 +149,26 @@ void undo_changes(void)
         else if (change.tag == Change_Tag_remove_character)
         {
             Line* line = &buffer->lines[location.line];
-
-            memmove(&line->characters[location.column + 1], &line->characters[location.column], line->characters_length - location.column);
-            line->characters_length++;
-            line->characters[location.column++] = change.character;
+            insert_char(line, change.character, location.column);
+            if (index_of_last_character(line) != location.column)
+                location.column++;
         }
         else if (change.tag == Change_Tag_insert_line)
             assert(false && "Change_Tag_insert_line not supported.");
         else if (change.tag == Change_Tag_remove_line)
             assert(false && "Change_Tag_remove_line not supported.");
         else if (change.tag == Change_Tag_merge_line)
-            assert(false && "Change_Tag_merge_line not supported.");
+        {
+            Line* current_line = &buffer->lines[location.line];
+            Line* next_line = insert_line(buffer, location.line + 1);
+            uint16_t remainder = current_line->characters_length - location.column;
+
+            insert_chars(next_line, 0, remainder, &current_line->characters[location.column]);
+            remove_chars(current_line, location.column, remainder);
+            
+            location.line++;
+            location.column = 0;
+        }
         else if (change.tag == Change_Tag_split_line)
             assert(false && "Change_Tag_split_line not supported.");
         else
@@ -149,7 +178,7 @@ void undo_changes(void)
     }
 
     go_to(view, tab->rectangle, false, change.cursor);
-    lexical_analyze_lines(buffer, start.line, change.cursor.line);
+    lexical_analyze_lines(buffer, start.line, location.line);
 
     editor.refresh_needed = true;
 }
