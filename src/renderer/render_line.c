@@ -2,11 +2,12 @@
 
 static Font_Color token_tag_to_font_color[] =
 {
-    [Token_Tag_plain]   = Font_Color_plain,
-    [Token_Tag_comment] = Font_Color_comment,
-    [Token_Tag_keyword] = Font_Color_keyword,
-    [Token_Tag_string]  = Font_Color_string,
-    [Token_Tag_type]    = Font_Color_type
+    [Token_Tag_plain]       = Font_Color_plain,
+    [Token_Tag_comment]     = Font_Color_comment,
+    [Token_Tag_keyword]     = Font_Color_keyword,
+    [Token_Tag_string]      = Font_Color_string,
+    [Token_Tag_type]        = Font_Color_type,
+    [Token_Tag_white_space] = Font_Color_plain
 };
 
 static uint16_t logical_columns_to_rendered_columns(const Line* const line, const uint16_t from, const uint16_t to)

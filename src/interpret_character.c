@@ -682,6 +682,9 @@ void interpret_character(char character, bool ctrl)
 
             if ((start.line != end.line || start.column != end.column) && (operator == 'c' || operator == 'd'))
             {
+                // Removes any future changes before appending to the change list.
+                buffer->changes_length = buffer->current_change;
+
                 Change change =
                 {
                     .tag = Change_Tag_break,

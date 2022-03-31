@@ -25,8 +25,9 @@ set compiler_options= /std:c17 ^
                       /wd4701 ^
                       /wd4703 ^
                       /wd4706 ^
-                      /wd4201^
-                      /diagnostics:caret
+                      /wd4201 ^
+                      /diagnostics:caret ^
+                      /fsanitize=address
                       
 set linker_options= /OUT:bin\moss.exe ^
                     /PDB:bin\moss.pdb ^
