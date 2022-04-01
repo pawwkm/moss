@@ -155,7 +155,7 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
     // These are sorted by length ascending order which 
     // is used to bail out of a loop early if next keyword
     // is longer than expected.
-    static String_Slice keywords[47] =
+    static String_Slice keywords[] =
     {
         { 2,  "if"             },
         { 2,  "do"             },
@@ -403,8 +403,9 @@ void lexical_analyze_c(Line* line, bool* continue_multiline_comment)
     {
         const uint16_t start_index = index;
 
-        Token* const token = add_token(line);
+        Token* token = add_token(line);
         token->characters = &line->characters[index];
+        token->tag = Token_Tag_plain;
         
         if (*continue_multiline_comment)
         {

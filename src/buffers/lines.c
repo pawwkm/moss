@@ -4,41 +4,39 @@
 
 void insert_char(Line* line, char c, uint16_t index)
 {
-    line->characters_length++;
-    if (line->characters_capacity < line->characters_length)
-        line->characters_capacity = line->characters_capacity ? line->characters_capacity * 2 : 4;
-
-    memmove(&line->characters[index + 1], &line->characters[index], line->characters_length - index);
-    
-    line->characters[index] = c;   
+    INSERT_ELEMENTS(line->characters, index, 1, &c);
 }
 
 void insert_chars(Line* line, uint16_t index, uint16_t amount, char* chars)
 {
-    if (line->characters_capacity < index + amount)
-    {
-        while (line->characters_capacity < index + amount)
-            line->characters_capacity = line->characters_capacity ? line->characters_capacity * 2 : 4;
-
-        line->characters = realloc(line->characters, line->characters_capacity);
-    }
-
-    memmove(&line->characters[index + amount], &line->characters[index], amount);
-    memcpy(&line->characters[index], chars, amount);
-
-    line->characters_length += amount;
+    INSERT_ELEMENTS(line->characters, index, amount, chars);
 }
 
 void remove_chars(Line* line, uint16_t index, uint16_t amount)
 {
-    assert(line->characters_length >= index + amount);
-    memmove(&line->characters[index], &line->characters[index + amount], line->characters_length - (index + amount - 1));
-
-    line->characters_length -= amount;
+    REMOVE_ELEMENTS(line->characters, index, amount);
 }
 
 void line_free(Line* line)
 {
     free(line->tokens);
     free(line->characters);
+}
+
+// The cursor can be placed after the last character in a line which means that
+// characters are appended, not inserted. But that also means that if the editor
+// tries to read what is under the cursor it may overrun the line buffer by 1
+//
+// That is not really communicated well by using -1 in some places and not in 
+// others.
+uint16_t index_of_last_character(const Line* line)
+{
+    assert(line->characters_length);
+
+    return line->characters_length - 1;
+}
+
+uint16_t index_of_character_append(const Line* line)
+{
+    return line->characters_length;
 }

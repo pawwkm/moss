@@ -7,7 +7,7 @@ static bool is_owen_hex_digit(const uint32_t character)
 }
 static bool is_owen_hex_quad(const Line* const line, const uint16_t index)
 {
-    return index + 3 <= line->characters_length &&
+    return index + 3 < line->characters_length &&
            is_owen_hex_digit(line->characters[index]) &&
            is_owen_hex_digit(line->characters[index + 1]) &&
            is_owen_hex_digit(line->characters[index + 2]) &&

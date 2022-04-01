@@ -3,20 +3,23 @@
 
 void add_change(Buffer* buffer, Change change)
 {
-    if (buffer->changes_length == buffer->changes_capacity)
-    {
-        buffer->changes_capacity = buffer->changes_capacity ? buffer->changes_capacity * 2 : 4;
-        buffer->changes = realloc(buffer->changes, sizeof(buffer->changes[0]) * buffer->changes_capacity);
-
-        memset(buffer->changes + buffer->changes_length, 0, sizeof(buffer->changes[0]) * (buffer->changes_capacity - buffer->changes_length));
-    }
-
-    buffer->changes[buffer->changes_length++] = change;
+    INSERT_ELEMENTS(buffer->changes, buffer->changes_length, 1, &change);
 }
 
-static Location apply_change(Buffer* buffer, Change change, Location location, bool is_undo)
+static uint16_t count_consecutive_changes(Buffer* buffer)
 {
-    static Change_Tag opposites[] = 
+    uint16_t count = 1;
+    Change_Tag tag = buffer->changes[buffer->current_change].tag;
+
+    while (tag == buffer->changes[buffer->current_change + count].tag)
+        count++;
+
+    return count;
+}
+
+static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
+{    
+    static Change_Tag undoers[] = 
     {
         [Change_Tag_break]            = Change_Tag_break,
         [Change_Tag_insert_character] = Change_Tag_remove_character,
@@ -27,92 +30,6 @@ static Location apply_change(Buffer* buffer, Change change, Location location, b
         [Change_Tag_split_line]       = Change_Tag_merge_line
     };
 
-    if (is_undo)
-        change.tag = opposites[change.tag];
-
-    switch (change.tag)
-    {
-        case Change_Tag_insert_character:
-        {
-            Line* line = &buffer->lines[location.line];
-            insert_char(line, change.character, location.column);
-            if (index_of_last_character(line) != location.column)
-                location.column++;
-
-            break;
-        }
-
-        case Change_Tag_remove_character:
-        {
-            // TODO: Count consecutive Change_Tag_remove_character and remove them in one go.
-            Line* line = &buffer->lines[location.line];
-            assert(line->characters_length);
-
-            remove_chars(line, location.column, 1);
-            break;
-        }
-
-        case Change_Tag_insert_line:
-            assert(false && "Change_Tag_insert_line not supported.");
-            break;
-
-        case Change_Tag_remove_line:
-        {
-            assert(!buffer->lines[location.line].characters_length);
-            remove_lines(buffer, location.line, 1);
-            // TODO: Count consecutive Change_Tag_remove_line and remove them in one go.
-            break;
-        }
-
-        case Change_Tag_merge_line:
-        {
-            Line* current_line = &buffer->lines[location.line];
-            assert(current_line->characters_length);
-
-            Line* next_line = &buffer->lines[location.line + 1];
-            uint16_t combined_characters_length = current_line->characters_length + next_line->characters_length;
-
-            if (current_line->characters_capacity < combined_characters_length)
-            {
-                while (current_line->characters_capacity < combined_characters_length)
-                    current_line->characters_capacity = current_line->characters_capacity ? current_line->characters_capacity * 2 : 4;
-
-                current_line->characters = realloc(current_line->characters, current_line->characters_capacity);
-            }
-
-            memcpy(&current_line->characters[current_line->characters_length], next_line->characters, next_line->characters_length);
-            current_line->characters_length = combined_characters_length;
-
-            remove_lines(buffer, location.line + 1, 1);
-
-            break;
-        }
-
-        case Change_Tag_split_line:
-        {
-            Line* current_line = &buffer->lines[location.line];
-            Line* next_line = insert_line(buffer, location.line + 1);
-            uint16_t remainder = current_line->characters_length - location.column;
-
-            insert_chars(next_line, 0, remainder, &current_line->characters[location.column]);
-            remove_chars(current_line, location.column, remainder);
-
-            location.line++;
-            location.column = 0;
-
-            break;
-        }
-
-        default:
-            assert(false && "Unexpected Change_Tag.");
-            break;
-    }
-
-    return location;
-}
-
-static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
-{
     Change change = buffer->changes[buffer->current_change++];
     assert(change.tag == Change_Tag_break);
 
@@ -125,8 +42,87 @@ static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
         if (change.tag == Change_Tag_break)
             break;
 
-        location = apply_change(buffer, change, location, is_undo);
-        buffer->current_change++;
+        if (is_undo)
+            change.tag = undoers[change.tag];
+
+        switch (change.tag)
+        {
+            case Change_Tag_insert_character:
+            {
+                Line* line = &buffer->lines[location.line];
+                insert_char(line, change.character, location.column);
+                if (index_of_last_character(line) != location.column)
+                    location.column++;
+
+                buffer->current_change++;
+                break;
+            }
+
+            case Change_Tag_remove_character:
+            {
+                Line* line = &buffer->lines[location.line];
+                assert(line->characters_length);
+
+                uint16_t chars = count_consecutive_changes(buffer);
+                remove_chars(line, location.column, chars);
+                buffer->current_change += chars;
+
+                break;
+            }
+
+            case Change_Tag_insert_line:
+                assert(false && "Change_Tag_insert_line not supported.");
+                buffer->current_change++;
+                break;
+
+            case Change_Tag_remove_line:
+            {
+                assert(!buffer->lines[location.line].characters_length);
+                remove_lines(buffer, location.line, 1);
+                // TODO: Count consecutive Change_Tag_remove_line (that may or may 
+                // not contain Change_Tag_remove_character in between) and remove them in one go.
+                buffer->current_change++;
+                break;
+            }
+
+            case Change_Tag_merge_line:
+            {
+                Line* current_line = &buffer->lines[location.line];
+                assert(current_line->characters_length);
+
+                Line* next_line = &buffer->lines[location.line + 1];
+                uint16_t combined_characters_length = current_line->characters_length + next_line->characters_length;
+
+                RESERVE_ELEMENTS(current_line->characters, combined_characters_length);
+                memcpy(&current_line->characters[current_line->characters_length], next_line->characters, next_line->characters_length);
+                current_line->characters_length = combined_characters_length;
+
+                remove_lines(buffer, location.line + 1, 1);
+
+                buffer->current_change++;
+                break;
+            }
+
+            case Change_Tag_split_line:
+            {
+                Line* current_line = &buffer->lines[location.line];
+                Line* next_line = insert_line(buffer, location.line + 1);
+                uint16_t remainder = current_line->characters_length - location.column;
+
+                insert_chars(next_line, 0, remainder, &current_line->characters[location.column]);
+                remove_chars(current_line, location.column, remainder);
+
+                location.line++;
+                location.column = 0;
+
+                buffer->current_change++;
+                break;
+            }
+
+            default:
+                assert(false && "Unexpected Change_Tag.");
+                break;
+        }
     }
 
     go_to(view, tab->rectangle, false, is_undo ? start : change.cursor);
@@ -139,7 +135,7 @@ void do_changes(void)
 {
     Tab* tab = &editor.tabs[editor.active_tab_index];
     View* view = find_active_tab_view(tab);
-    Buffer* buffer = buffer_handle_to_pointer(view->buffer);
+    Buffer* buffer = lookup_buffer(view->buffer);
     
     if (buffer->changes_length - 1 == buffer->current_change)
         return;
@@ -151,7 +147,7 @@ void undo_changes(void)
 {
     Tab* tab = &editor.tabs[editor.active_tab_index];
     View* view = find_active_tab_view(tab);
-    Buffer* buffer = buffer_handle_to_pointer(view->buffer);
+    Buffer* buffer = lookup_buffer(view->buffer);
 
     if (!buffer->current_change)
         return;

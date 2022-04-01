@@ -131,7 +131,7 @@ void show_initialization_error_message(const char* format, ...)
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Could not initialize Moss!", message, NULL);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     initialize_window();
     initialize_renderer(window);

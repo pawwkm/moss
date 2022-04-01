@@ -3,7 +3,7 @@
 void render_view(const View* const view, const Rectangle view_rectangle)
 {
     const bool is_active_view = view == find_active_editor_view();
-    const Buffer* const buffer = buffer_handle_to_pointer(view->buffer);
+    const Buffer* const buffer = lookup_buffer(view->buffer);
 
     for (uint16_t l = 0; l + view->offset.line < buffer->lines_length; l++)
     {

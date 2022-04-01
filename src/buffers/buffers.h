@@ -23,5 +23,4 @@ void remove_chars(Line* line, uint16_t index, uint16_t amount);
 void remove_lines(Buffer* buffer, uint16_t index, uint16_t amount);
 
 Line* insert_line(Buffer* buffer, uint16_t index);
-Line* add_line(Buffer* buffer);
 Token* add_token(Line* line);

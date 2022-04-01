@@ -1,6 +1,7 @@
 #include "moss.h"
 
 #include <assert.h>
+#include <string.h>
 
 static void enter_insert_mode(void)
 {
@@ -55,12 +56,7 @@ static void exit_tab_mode(void)
 
 static void insert_character_into_command(const char character)
 {
-    if (editor.command_length == editor.command_capacity)
-    {
-        editor.command_capacity = editor.command_capacity ? editor.command_capacity * 2 : 4;
-        editor.command = realloc(editor.command, sizeof(editor.command[0]) * editor.command_capacity);
-    }
-
+    RESERVE_ELEMENTS(editor.command, editor.command_length + 1);
     editor.command[editor.command_length++] = character;
     editor.command_cursor++;
 
@@ -71,6 +67,7 @@ static void clear_command(void)
 {
     if (editor.command_length)
     {
+        memset(editor.command, 0, editor.command_length);
         editor.command_cursor = 0;
         editor.command_length = 0;
         editor.refresh_needed = true;
@@ -96,8 +93,7 @@ static void delete_previous_character_in_command(void)
     if (!editor.command_cursor)
         return;
 
-    for (uint16_t i = editor.command_cursor; i < editor.command_length; i++)
-        editor.command[i - 1] = editor.command[i];
+    REMOVE_ELEMENTS(editor.command, editor.command_length - 1, 1);
 
     editor.command_length--;
     editor.command_cursor--;
@@ -489,7 +485,7 @@ void interpret_character(char character, bool ctrl)
                             return;
 
                         View* view = find_active_editor_view();
-                        Buffer* buffer = buffer_handle_to_pointer(view->buffer);
+                        Buffer* buffer = lookup_buffer(view->buffer);
                         Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
                         Location location = motion_to_location('^', 1, buffer, view);
 
@@ -505,7 +501,7 @@ void interpret_character(char character, bool ctrl)
                             return;
 
                         View* view = find_active_editor_view();
-                        Buffer* buffer = buffer_handle_to_pointer(view->buffer);
+                        Buffer* buffer = lookup_buffer(view->buffer);
                         Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
                         Location location = motion_to_location('l', 1, buffer, view);
 
@@ -521,7 +517,7 @@ void interpret_character(char character, bool ctrl)
                             return;
 
                         View* view = find_active_editor_view();
-                        Buffer* buffer = buffer_handle_to_pointer(view->buffer);
+                        Buffer* buffer = lookup_buffer(view->buffer);
                         Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
                         Location location = motion_to_location('$', 1, buffer, view);
 
@@ -649,7 +645,7 @@ void interpret_character(char character, bool ctrl)
             bool use_preferred_column = 'j' == motion || 'k' == motion;
 
             View* view = find_active_editor_view();
-            Buffer* buffer = buffer_handle_to_pointer(view->buffer);
+            Buffer* buffer = lookup_buffer(view->buffer);
 
             Location start = { 0 };
             Location end   = { 0 };

@@ -14,6 +14,55 @@
 #define LINE_SCROLL_PADDING 5
 #define VISIBLE_LINES_IN_TAB ((editor.height - TAB_HEADER_HEIGHT - STATUS_LINE_HEIGHT) / FONT_HEIGHT)
 
+#define RESERVE_ELEMENTS(ELEMENTS, AMOUNT)                                                                        \
+do                                                                                                                \
+{                                                                                                                 \
+    if (ELEMENTS##_capacity < (AMOUNT))                                                                           \
+    {                                                                                                             \
+        while (ELEMENTS##_capacity < (AMOUNT))                                                                    \
+        {                                                                                                         \
+            ELEMENTS##_capacity = ELEMENTS##_capacity ? ELEMENTS##_capacity * 2 : 4;                              \
+            if (!ELEMENTS##_capacity)                                                                             \
+                assert(false && "Out of memory.");                                                                \
+        }                                                                                                         \
+                                                                                                                  \
+        ELEMENTS = realloc(ELEMENTS, sizeof(ELEMENTS[0]) * ELEMENTS##_capacity);                                  \
+        memset(ELEMENTS + ELEMENTS##_length, 0, sizeof(ELEMENTS[0]) * (ELEMENTS##_capacity - ELEMENTS##_length)); \
+    }                                                                                                             \
+} while (false)
+
+#define ADD_ELEMENT(ELEMENTS, ELEMENT)                 \
+do                                                     \
+{                                                      \
+    RESERVE_ELEMENTS(ELEMENTS, ELEMENTS##_length + 1); \
+    ELEMENTS[ELEMENTS##_length] = ELEMENT;             \
+} while (false)
+
+#define INSERT_ELEMENTS(ELEMENTS, INDEX, AMOUNT, ES)                                                               \
+do                                                                                                                 \
+{                                                                                                                  \
+    RESERVE_ELEMENTS(ELEMENTS, ELEMENTS##_length + (AMOUNT));                                                      \
+    memmove(&ELEMENTS[(INDEX) + (AMOUNT)], &ELEMENTS[INDEX], sizeof(ELEMENTS[0]) * (ELEMENTS##_length - (INDEX))); \
+    memcpy(&ELEMENTS[INDEX], ES, sizeof(ELEMENTS[0]) * (AMOUNT));                                                  \
+    ELEMENTS##_length += AMOUNT;                                                                                   \
+} while (false)
+
+#define REMOVE_ELEMENTS(ELEMENTS, INDEX, AMOUNT)                                                                                \
+do                                                                                                                              \
+{                                                                                                                               \
+    memmove(&ELEMENTS[INDEX], &ELEMENTS[(INDEX) + (AMOUNT)], sizeof(ELEMENTS[0]) * (ELEMENTS##_length - ((INDEX) + (AMOUNT)))); \
+    ELEMENTS##_length -= AMOUNT;                                                                                                \
+} while (false)
+
+#define REMOVE_ELEMENTS_WITH_DEALLOCATOR(ELEMENTS, INDEX, AMOUNT, DEALLOCATOR) \
+do                                                                             \
+{                                                                              \
+    for (size_t i = INDEX; i < AMOUNT; i++)                                    \
+        DEALLOCATOR(&ELEMENTS[i]);                                             \
+                                                                               \
+    REMOVE_ELEMENTS(ELEMENTS, INDEX, AMOUNT);                                  \
+} while (false)
+
 typedef enum
 {
     Mode_normal,
@@ -209,7 +258,7 @@ void initialize_renderer(SDL_Window* window);
 void uninitialize_renderer(void);
 
 // Buffers
-Buffer* buffer_handle_to_pointer(Buffer_Handle handle);
+Buffer* lookup_buffer(Buffer_Handle handle);
 
 bool open_buffer(char* path, uint16_t path_length, Buffer_Handle* handle);
 

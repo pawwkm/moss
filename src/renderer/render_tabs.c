@@ -23,7 +23,7 @@ static void render_tab_headers(const Tab* const tab, const Rectangle tab_rectang
     for (uint16_t v = 0; v < tab->views_length; v++)
     {
         const View* const view = &tab->views[v];
-        const Buffer* const buffer = buffer_handle_to_pointer(view->buffer);
+        const Buffer* const buffer = lookup_buffer(view->buffer);
 
         Rectangle header_line;
         header_line.position.y = (TAB_HEADER_HEIGHT - FONT_HEIGHT) / 2;
