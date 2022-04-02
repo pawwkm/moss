@@ -138,7 +138,7 @@ void do_changes(void)
     View* view = find_active_tab_view(tab);
     Buffer* buffer = lookup_buffer(view->buffer);
     
-    if (buffer->changes_length - 1 == buffer->current_change)
+    if (!buffer->changes_length || buffer->changes_length - 1 == buffer->current_change)
         return;
 
     apply_changes(tab, view, buffer, false);
