@@ -209,18 +209,6 @@ static Location motion_to_location(char motion, uint16_t repetition, Buffer* buf
                 location.line = buffer->lines_length - 1;
             
             break;
-
-        case 'H':
-            assert(false && "H motion not implemented.");
-            break;
-
-        case 'M':
-            assert(false && "M motion not implemented.");
-            break;
-
-        case 'L':
-            assert(false && "L motion not implemented.");
-            break;
         
         case 'f':
         case 't':
@@ -596,7 +584,7 @@ void interpret_character(char character, bool ctrl)
             char* operators  = "dcyg";
             char* objects    = "w[]{}()<>`'\"";
             char* modifiers  = "ai";
-            char* motions    = "hjkl^$webGHMLfFtT";
+            char* motions    = "hjkl^$webGfFtT";
 
             // Parse command.
             insert_character_into_command(character);

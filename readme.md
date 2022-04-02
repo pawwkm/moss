@@ -51,8 +51,7 @@ double_operator <- 'dd' / 'cc' / 'yy' / 'gg'
 ### Motions
 ```peg
 motion <- 'h' / 'j' / 'k' / 'l' / '^' / '$' / 'w' 
-        / 'e' / 'b' / 'G' / 'H' / 'M' / 'L' / 'n'
-        / 'N' 
+        / 'e' / 'b' / 'G' / 'n' / 'N' 
         / [fFtT] .
 ```
 
