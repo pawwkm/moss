@@ -268,6 +268,10 @@ static Location motion_to_location(char motion, uint16_t repetition, Buffer* buf
                 location.column = motion == 'T' ? index + 1 : index;
 
             break;
+
+        default:
+            assert(false && "Unknown motion.");
+            break;
     }
 
     return location;

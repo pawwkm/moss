@@ -24,8 +24,8 @@ static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
         [Change_Tag_break]            = Change_Tag_break,
         [Change_Tag_insert_character] = Change_Tag_remove_character,
         [Change_Tag_remove_character] = Change_Tag_insert_character,
-        [Change_Tag_insert_line]      = Change_Tag_remove_line,
-        [Change_Tag_remove_line]      = Change_Tag_insert_line,
+        [Change_Tag_insert_line]      = Change_Tag_merge_line,
+        [Change_Tag_remove_line]      = Change_Tag_split_line,
         [Change_Tag_merge_line]       = Change_Tag_split_line,
         [Change_Tag_split_line]       = Change_Tag_merge_line
     };
@@ -69,9 +69,16 @@ static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
             }
 
             case Change_Tag_insert_line:
-                assert(false && "Change_Tag_insert_line not supported.");
+            {
+                Line line = { 0 };
+                INSERT_ELEMENTS(buffer->lines, location.line, 1, &line);
+
+                location.line++;
+                location.column = 0;
+
                 buffer->current_change++;
                 break;
+            }
 
             case Change_Tag_remove_line:
             {
