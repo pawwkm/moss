@@ -131,6 +131,9 @@ static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
 
 void do_changes(void)
 {
+    if (!editor.tabs_length)
+        return;
+
     Tab* tab = &editor.tabs[editor.active_tab_index];
     View* view = find_active_tab_view(tab);
     Buffer* buffer = lookup_buffer(view->buffer);
@@ -143,6 +146,9 @@ void do_changes(void)
 
 void undo_changes(void)
 {
+    if (!editor.tabs_length)
+        return;
+
     Tab* tab = &editor.tabs[editor.active_tab_index];
     View* view = find_active_tab_view(tab);
     Buffer* buffer = lookup_buffer(view->buffer);
