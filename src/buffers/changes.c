@@ -51,9 +51,7 @@ static void apply_changes(Tab* tab, View* view, Buffer* buffer, bool is_undo)
             {
                 Line* line = &buffer->lines[location.line];
                 insert_char(line, change.character, location.column);
-                if (index_of_last_character(line) != location.column)
-                    location.column++;
-
+                location.column++;
                 buffer->current_change++;
                 break;
             }
