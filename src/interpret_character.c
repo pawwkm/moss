@@ -112,7 +112,7 @@ static bool character_is_1_of(char c, const char* string)
     return false;
 }
 
-static Location motion_to_location(char motion, uint16_t repetition, Buffer* buffer, View* view)
+static Location motion_to_location(char motion, uint16_t repetition, Buffer* buffer, View* view, char c)
 {
     Location location =
     {
@@ -221,19 +221,40 @@ static Location motion_to_location(char motion, uint16_t repetition, Buffer* buf
         case 'L':
             assert(false && "L motion not implemented.");
             break;
-
+        
         case 'f':
-            assert(false && "f motion not implemented.");
+        case 't':
+        {
+            location.column = view->offset.column + view->cursor.column;
+            if (c == 0xFF)
+                break;
+
+            Line* line = &buffer->lines[location.line];
+            uint16_t index = location.column;
+            
+            while (index < line->characters_length)
+            {
+                if (line->characters[index] == c)
+                {
+                    if (--repetition)
+                        index++;
+                    else
+                        break;
+                }
+
+                index++;
+            }
+
+            if (!repetition)
+                location.column = motion == 'f' ? index + 1 : index;
+
             break;
+        }
 
         case 'F':
             assert(false && "F motion not implemented.");
             break;
-        
-        case 't':
-            assert(false && "t motion not implemented.");
-            break;
-        
+
         case 'T':
             assert(false && "T motion not implemented.");
             break;
@@ -487,7 +508,7 @@ void interpret_character(char character, bool ctrl)
                         View* view = find_active_editor_view();
                         Buffer* buffer = lookup_buffer(view->buffer);
                         Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
-                        Location location = motion_to_location('^', 1, buffer, view);
+                        Location location = motion_to_location('^', 1, buffer, view, 0xFF);
 
                         editor.refresh_needed = go_to(view, rectangle, false, location);
                         enter_insert_mode();
@@ -503,7 +524,7 @@ void interpret_character(char character, bool ctrl)
                         View* view = find_active_editor_view();
                         Buffer* buffer = lookup_buffer(view->buffer);
                         Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
-                        Location location = motion_to_location('l', 1, buffer, view);
+                        Location location = motion_to_location('l', 1, buffer, view, 0xFF);
 
                         editor.refresh_needed = go_to(view, rectangle, false, location);
                         enter_insert_mode();
@@ -519,7 +540,7 @@ void interpret_character(char character, bool ctrl)
                         View* view = find_active_editor_view();
                         Buffer* buffer = lookup_buffer(view->buffer);
                         Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
-                        Location location = motion_to_location('$', 1, buffer, view);
+                        Location location = motion_to_location('$', 1, buffer, view, 0xFF);
 
                         editor.refresh_needed = go_to(view, rectangle, false, location);
                         enter_insert_mode();
@@ -580,6 +601,7 @@ void interpret_character(char character, bool ctrl)
             char motion   = 0;
             char modifier = 0;
             char object   = 0;
+            char c        = 0xFF;
 
             if (character_is_1_of(editor.command[command_index], operators))
             {
@@ -606,6 +628,14 @@ void interpret_character(char character, bool ctrl)
                         repetition--;
                     else if (!repetition)
                         repetition = motion == 'G' ? UINT16_MAX : 1;
+
+                    if (character_is_1_of(motion, "fFtT"))
+                    {
+                        if (command_index == editor.command_length)
+                            return;
+
+                        c = editor.command[command_index++];
+                    }
                 }
                 else if (!repetition)
                 {
@@ -637,6 +667,14 @@ void interpret_character(char character, bool ctrl)
                     repetition--;
                 else if (!repetition)
                     repetition = motion == 'G' ? UINT16_MAX : 1;
+
+                if (character_is_1_of(motion, "fFtT"))
+                {
+                    if (command_index == editor.command_length)
+                        return;
+
+                    c = editor.command[command_index++];
+                }
             }
             else
                 return;
@@ -654,7 +692,7 @@ void interpret_character(char character, bool ctrl)
                 start.line = view->offset.line + view->cursor.line;
                 start.column = view->offset.column + view->cursor.column;
 
-                end = motion_to_location(motion, repetition, buffer, view); 
+                end = motion_to_location(motion, repetition, buffer, view, c); 
             }
             else if (object)
                 object_to_span(object, modifier, &start, &end, buffer, view);
@@ -663,7 +701,7 @@ void interpret_character(char character, bool ctrl)
                 start.line = view->offset.line + view->cursor.line;
                 start.column = view->offset.column + view->cursor.column;
 
-                end = motion_to_location(motion, repetition, buffer, view);
+                end = motion_to_location(motion, repetition, buffer, view, c);
                 Rectangle rectangle = editor.tabs[editor.active_tab_index].rectangle;
 
                 editor.refresh_needed = go_to(view, rectangle, use_preferred_column, end);
