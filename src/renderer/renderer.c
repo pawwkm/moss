@@ -67,6 +67,14 @@ void initialize_renderer(SDL_Window* const window)
         exit(1);
     }
 
+    if (!SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1"))
+    {
+        SDL_Log("Could not use render batching\n");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+    }
+
     initialize_font();
 }
 
