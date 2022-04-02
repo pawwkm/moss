@@ -252,11 +252,33 @@ static Location motion_to_location(char motion, uint16_t repetition, Buffer* buf
         }
 
         case 'F':
-            assert(false && "F motion not implemented.");
-            break;
-
         case 'T':
-            assert(false && "T motion not implemented.");
+            location.column = view->offset.column + view->cursor.column;
+            if (c == 0xFF)
+                break;
+
+            Line* line = &buffer->lines[location.line];
+            uint16_t index = location.column;
+
+            while (true)
+            {
+                if (line->characters[index] == c)
+                {
+                    if (--repetition)
+                        index--;
+                    else
+                        break;
+                }
+
+                if (!index)
+                    break;
+
+                index--;
+            }
+
+            if (!repetition)
+                location.column = motion == 'T' ? index + 1 : index;
+
             break;
     }
 
