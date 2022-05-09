@@ -4,15 +4,15 @@
 
 typedef enum
 {
-    Font_Color_plain,
-    Font_Color_comment,
-    Font_Color_keyword,
-    Font_Color_string,
-    Font_Color_type,
-    Font_Color_inactive_tab_header,
-    Font_Color_active_tab_header,
-    Font_Color_mode,
-    Font_Color_selected
+    Font_Color_plain = 0,
+    Font_Color_comment = 1,
+    Font_Color_keyword = 2,
+    Font_Color_string = 3,
+    Font_Color_type = 4,
+    Font_Color_inactive_tab_header = 5,
+    Font_Color_active_tab_header = Font_Color_plain,
+    Font_Color_mode = 6,
+    Font_Color_selected = 7
 } Font_Color;
 
 typedef struct
