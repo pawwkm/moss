@@ -9,6 +9,8 @@ This is a proof of concept of a Modal text editor for my personal use. Supply `m
 ```peg
 NORMAL <- TAB
         / INSERT
+        / redo
+        / undo
         / search
         / operator modifier object
         / repetition? (shorthand_operator / double_operator / operator? motion)
@@ -20,6 +22,11 @@ search <- ('/' / '?') (!enter char)* enter
 
 ## NORMAL
 Editing in NORMAL mode works on spans of texts specified by `motion`s and `object`s now referred to as text selection. If no text selection be found the operator does nothing.
+
+```peg
+redo <- 'r'
+undo <- 'u'
+```
 
 ### Operators
 ```peg
@@ -67,9 +74,9 @@ If `motion`s are used with an `operator` it selects the text from where the curs
 * `e` moves the cursor to the end of the next token.
 * `b` moves the cursor to the start of the previous token.
 * `G` moves the cursor to the last line and the prefered column is ignored.
-* `H` moves the cursor to the line just below `LINE_SCROLL_PADDING`.
+* `H` moves the cursor to the line just below `editor.line_scroll_padding`.
 * `M` moves the cursor to the line in the middle of the view.
-* `L` moves the cursor to the line just above `LINE_SCROLL_PADDING`.
+* `L` moves the cursor to the line just above `editor.line_scroll_padding`.
 * `n` moves the cursor to the first character of the next search result. 
 * `N` moves the cursor to the first character of the previous search result. 
 * `f` moves the cursor to the first occurrence of the given character to the right of the cursor on the same line.
@@ -129,28 +136,16 @@ TAB <- '\t' [hjHJklKLfgdsC]* escape
 # File encodings
 Files opened are expected to be ASCII encoded.
 
-# Rendering
-The rendering is done entirely using 
-
-* [SDL_RenderFillRect](https://wiki.libsdl.org/SDL_RenderFillRect)
-* [SDL_RenderCopy](https://wiki.libsdl.org/SDL_RenderCopy)
-* [SDL_RenderDrawLine](https://wiki.libsdl.org/SDL_RenderDrawLine)
-
 ## Font rendering
-The ASCII portion of [cozette.c](src/renderer/cozette.c) is used for rendering text. In the case of non-ASCII characters a ? where the colors are inverted is used.
-
-# GPU usage
-Rendering is GPU accelerated but no frames are drawn unless resizing, typing or
-something simmilar happens that requires drawing a new frame.
+The ASCII portion of [Cozette](https://github.com/slavfox/Cozette) is used for rendering text. In the case of non-ASCII characters a ? using the error [color](editor/renderer/colors.c).
 
 # Building
 ## Windows
 1. Open up the [Visual Studio Developer Command Prompt](https://docs.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2019) with the `x64` environment.
 2. Navigate to the root directory.
-3. Run `build.bat`.
+3. Run `build.bat tests && cd bin && moss && cd .. && build.bat win32 release`.
 
 `moss.exe` should sit in `root/bin/`.
 
 # Dependencies
-* I use the a subset of the [Cozette](https://github.com/slavfox/Cozette) font. Check out [cozette.c](src/renderer/cozette.c) for more details.
-* [SDL2](https://www.libsdl.org/).
+* I use the ascii subset of the [Cozette](https://github.com/slavfox/Cozette) font. Check out [configuration.c](configuration.c) for more details.

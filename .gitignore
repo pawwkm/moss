@@ -1,1 +1,5 @@
 bin/
+tests/images/font_sheet.ppm
+**_actual.ppm
+**_diff.ppm
+*.pdb

@@ -1,0 +1,5 @@
+#define APSTUDIO_READONLY_SYMBOLS
+#include "winres.h"
+#undef APSTUDIO_READONLY_SYMBOLS
+
+MAINICON ICON "icon.ico"
