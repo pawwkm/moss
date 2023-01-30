@@ -137,7 +137,7 @@ TAB <- '\t' [hjHJklKLfgdsC]* escape
 Files opened are expected to be ASCII encoded.
 
 ## Font rendering
-The ASCII portion of [Cozette](https://github.com/slavfox/Cozette) is used for rendering text. In the case of non-ASCII characters a ? using the error [color](editor/renderer/colors.c).
+The ASCII portion of [Cozette](https://github.com/slavfox/Cozette) (check [configuration.c](configuration.c#L43-L49) for more details) is used for rendering text. In the case of non-ASCII characters a ? using [Font_Color_error](https://github.com/pawwkm/moss/blob/main/configuration.c#L17-L41).
 
 # Building
 ## Windows
@@ -146,6 +146,3 @@ The ASCII portion of [Cozette](https://github.com/slavfox/Cozette) is used for r
 3. Run `build.bat tests && cd bin && moss && cd .. && build.bat win32 release`.
 
 `moss.exe` should sit in `root/bin/`.
-
-# Dependencies
-* I use the ascii subset of the [Cozette](https://github.com/slavfox/Cozette) font. Check out [configuration.c](configuration.c) for more details.
