@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <assert.h>
 
 static Editor editor;
 static HDC hdc;
@@ -26,16 +27,38 @@ double time_in_us(void)
     return (double)captureTime.QuadPart / frequency;
 }
 
+RECT block_to_rect(Block b)
+{
+    return (RECT)
+    {
+        .left = b.x,
+        .top = b.y,
+        .right = b.x + b.width,
+        .bottom = b.y + b.height
+    };
+}
+
+void scroll_region(Region region)
+{
+    RECT r = block_to_rect(region.block);
+    ScrollDC
+    (
+        hdc, 
+        region.scroll_x,
+        region.scroll_y,
+        &r,
+        &r,
+        NULL,
+        &(RECT){ 0 }
+    );
+}
+
 void render_block(Color color, Block block)
 {
     HBRUSH brush = CreateSolidBrush(RGB(color.r, color.g, color.b));
-    FillRect(hdc, &(RECT)
-    {
-        .left = block.x,
-        .top = block.y,
-        .right = block.x + block.width,
-        .bottom = block.y + block.height
-    }, brush);
+    RECT r = block_to_rect(block);
+        
+    FillRect(hdc, &r, brush);
 
     DeleteObject(brush);
 }
@@ -70,44 +93,44 @@ char* read_file(char* const path, size_t* characters_length)
     FILE* file = fopen(path, "rb");
     if (!file)
     {
-        log("Could not open %s: %s\n", path, strerror(errno));
+        // log("Could not open %s: %s\n", path, strerror(errno));
         return NULL;
     }
 
     if (fseek(file, 0, SEEK_END) == -1)
     {
-        log("Could not seek in %s\n", path);
+        // log("Could not seek in %s\n", path);
         return NULL;
     }
 
     *characters_length = ftell(file);
     if (fseek(file, 0, SEEK_SET) == -1)
     {
-        log("Could not seek in %s\n", path);
+        // log("Could not seek in %s\n", path);
         return NULL;
     }
 
     char* characters = malloc(*characters_length);
     if (!characters)
     {
-        log("Could not allocate characters for %s\n", path);
+        // log("Could not allocate characters for %s\n", path);
         return NULL;
     }
 
     size_t characters_read = fread(characters, 1, *characters_length, file);
     if (characters_read != *characters_length)
     {
-        log("Read %u characters out of %u from %s\n", characters_read, *characters_length, path, strerror(errno));
+        // log("Read %u characters out of %u from %s\n", characters_read, *characters_length, path, strerror(errno));
         free(characters);
 
         if (fclose(file) < 0)
-            log("Could not close %s: %s\n", path, strerror(errno));
+            ;// log("Could not close %s: %s\n", path, strerror(errno));
 
         return NULL;
     }
 
     if (fclose(file) < 0)
-        log("Could not close %s: %s\n", path, strerror(errno));
+        ;// log("Could not close %s: %s\n", path, strerror(errno));
 
     return characters;
 }
@@ -301,7 +324,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, PSTR cmd, int show_cm
         size_t path_length = strlen(__argv[i]);
         if (path_length > MAX_PATH)
         {
-            //log(&editor, "Path to long");
+            //// log(&editor, "Path to long");
             continue;
         }
         

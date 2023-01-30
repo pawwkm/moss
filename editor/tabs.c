@@ -264,7 +264,14 @@ static void go_down(Editor* editor, View* view, Block view_block, uint16_t absol
         }
         else if (view->cursor.line + editor->line_scroll_padding >= visible_lines_in_tabs(editor))
         {
-            invalidate_block(editor, view_block);
+            //invalidate_block(editor, view_block);
+            invalidate_region(editor, (Region)
+            {
+                .scroll_x = 0,
+                .scroll_y = -editor->font_height,
+                .block = view_block
+            });
+            
             view->offset.line++;
         }
         else

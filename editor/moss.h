@@ -105,8 +105,6 @@ uint16_t index_of_character_append(const Line* line);
 Block intersecting_block(Block a, Block b);
 bool contains_block(Block outer, Block inner);
 bool is_empty_block(Block block);
-void invalidate_block(Editor* editor, Block block);
-void invalidate_location(Editor* editor);
 Block tab_to_view_block(const Editor* editor, Block tab_view);
 
 // ASCII
@@ -119,3 +117,8 @@ void log(const char* format, ...);
 // U16
 uint16_t max_u16(uint16_t a, uint16_t b);
 uint16_t min_u16(uint16_t a, uint16_t b);
+
+// Invaldation
+void invalidate_block(Editor* editor, Block block);
+void invalidate_region(Editor* editor, Region region);
+void invalidate_location(Editor* editor);

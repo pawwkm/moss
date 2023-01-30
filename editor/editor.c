@@ -5,14 +5,27 @@
 
 void invalidate_block(Editor* editor, Block block)
 {
+    invalidate_region(editor, (Region)
+    {
+        .scroll_x = 0,
+        .scroll_y = 0,
+        .block = block
+    });
+}
+
+void invalidate_region(Editor* editor, Region region)
+{
     for (uint8_t i = 0; i < editor->invalidated_length; i++)
     {
-        Block b = editor->invalidated[i];
-        if (contains_block(b, block))
+        Region r = editor->invalidated[i];
+        if (contains_block(r.block, region.block))
             return;
 
-        if (contains_block(block, b))
+        if (contains_block(region.block, r.block))
         {
+            assert(!region.scroll_x);
+            assert(!region.scroll_y);
+            
             if (i + 1 == editor->invalidated_length)
                 editor->invalidated_length--;
             else
@@ -20,7 +33,7 @@ void invalidate_block(Editor* editor, Block block)
         }
     }
 
-    ADD_ELEMENT(editor->invalidated, block);
+    ADD_ELEMENT(editor->invalidated, region);
 }
 
 void invalidate_location(Editor* editor)
