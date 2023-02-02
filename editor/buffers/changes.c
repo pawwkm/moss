@@ -130,7 +130,7 @@ static void apply_changes(Editor* editor, Tab* tab, View* view, Buffer* buffer, 
         }
     }
 
-    go_to(editor, view, tab_to_view_block(editor, tab->block), false, is_undo ? start : change.cursor);
+    go_to(editor, view, tab_to_view_block(editor, tab->block), is_undo ? start : change.cursor);
     lexical_analyze_lines(buffer, start.line, location.line);
 }
 

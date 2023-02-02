@@ -539,7 +539,7 @@ void interpret_character(Editor* editor, char character, bool ctrl)
                         Block block = tab_to_view_block(editor, editor->tabs[editor->active_tab_index].block);
                         Location location = motion_to_location('^', 1, buffer, view, 0xFF);
 
-                        go_to(editor, view, block, false, location);
+                        go_to(editor, view, block, location);
                         enter_insert_mode(editor);
 
                         return;
@@ -555,7 +555,7 @@ void interpret_character(Editor* editor, char character, bool ctrl)
                         Block block = tab_to_view_block(editor, editor->tabs[editor->active_tab_index].block);
                         Location location = motion_to_location('l', 1, buffer, view, 0xFF);
 
-                        go_to(editor, view, block, false, location);
+                        go_to(editor, view, block, location);
                         enter_insert_mode(editor);
 
                         return;
@@ -571,7 +571,7 @@ void interpret_character(Editor* editor, char character, bool ctrl)
                         Block block = tab_to_view_block(editor, editor->tabs[editor->active_tab_index].block);
                         Location location = motion_to_location('$', 1, buffer, view, 0xFF);
 
-                        go_to(editor, view, block, false, location);
+                        go_to(editor, view, block, location);
                         enter_insert_mode(editor);
 
                         return;
@@ -708,8 +708,6 @@ void interpret_character(Editor* editor, char character, bool ctrl)
                 return;
 
             // Reduce operators, motions and objects to a single span of characters.
-            bool use_preferred_column = 'j' == motion || 'k' == motion;
-
             View* view = find_active_editor_view(editor);
             Buffer* buffer = lookup_buffer(view->buffer);
 
@@ -732,7 +730,7 @@ void interpret_character(Editor* editor, char character, bool ctrl)
                 end = motion_to_location(motion, repetition, buffer, view, c);
                 Block block = tab_to_view_block(editor, editor->tabs[editor->active_tab_index].block);
 
-                go_to(editor, view, block, use_preferred_column, end);
+                go_to(editor, view, block, end);
             }
 
             if (start.line > end.line || start.line == end.line && start.column > end.column)

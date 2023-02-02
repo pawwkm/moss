@@ -149,6 +149,13 @@ typedef struct
 
 typedef struct
 {
+    int16_t scroll_x;
+    int16_t scroll_y;
+    Block block;
+} Region;
+
+typedef struct
+{
     View* views;
     uint8_t views_length;
     uint8_t views_capacity;
@@ -189,9 +196,9 @@ typedef struct
     //
     // So lets keep track of that ourselves.
     //
-    // It is assumed that blocks are not contained by or
-    // overlaps with any other block.
-    Block* invalidated;
+    // It is assumed that regions are not contained by or
+    // overlaps with any other region.
+    Region* invalidated;
     uint8_t invalidated_length;
     uint8_t invalidated_capacity;
 } Editor;
@@ -206,6 +213,7 @@ void interpret_character(Editor* editor, char character, bool ctrl);
 void open_buffer_in_active_tab(Editor* editor, char* path, uint16_t path_length);
 
 // Platform specific functions.
+void scroll_region(Region region);
 void render_block(Color color, Block block);
 void render_character(uint16_t source_x, uint16_t source_y, uint16_t destination_x, uint16_t destination_y, uint16_t width, uint16_t height);
 

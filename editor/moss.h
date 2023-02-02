@@ -79,7 +79,7 @@ void close_active_tab(Editor* editor);
 View* find_active_editor_view(const Editor* editor);
 View* find_active_tab_view(const Tab* tab);
 
-void go_to(Editor* editor, View* view, Block view_block, bool use_preferred_column, Location absolute_location);
+void go_to(Editor* editor, View* view, Block view_block, Location absolute);
 
 void measure_tabs(Editor * editor);
 
@@ -106,6 +106,7 @@ Block intersecting_block(Block a, Block b);
 bool contains_block(Block outer, Block inner);
 bool is_empty_block(Block block);
 Block tab_to_view_block(const Editor* editor, Block tab_view);
+bool is_scrolling_region(Region r);
 
 // ASCII
 bool is_tab_or_space(char c);

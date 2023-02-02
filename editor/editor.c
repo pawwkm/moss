@@ -3,6 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+static Block region_destination(Region region)
+{
+    return (Block)
+    {
+        .x = region.block.x + region.scroll_x,
+        .y = region.block.y + region.scroll_y,
+        .width = region.block.width + region.scroll_x,
+        .height = region.block.height + region.scroll_x
+    };
+}
+
 void invalidate_block(Editor* editor, Block block)
 {
     invalidate_region(editor, (Region)
@@ -13,23 +24,42 @@ void invalidate_block(Editor* editor, Block block)
     });
 }
 
+static uint8_t last_scroll(Editor* editor)
+{
+    if (editor->invalidated_length)
+    {
+        for (uint8_t i = editor->invalidated_length - 1; i; i--)
+        {
+            if (is_scrolling_region(editor->invalidated[i]))
+                return i;
+        }
+    }
+
+    return 0;
+}
+
 void invalidate_region(Editor* editor, Region region)
 {
-    for (uint8_t i = 0; i < editor->invalidated_length; i++)
+    if (!region.scroll_x && !region.scroll_y)
     {
-        Region r = editor->invalidated[i];
-        if (contains_block(r.block, region.block))
-            return;
-
-        if (contains_block(region.block, r.block))
+        for (uint8_t i = last_scroll(editor) + 1; i < editor->invalidated_length; i++)
         {
-            assert(!region.scroll_x);
-            assert(!region.scroll_y);
-            
-            if (i + 1 == editor->invalidated_length)
-                editor->invalidated_length--;
-            else
-                REMOVE_ELEMENT_UNORDERED(editor->invalidated, i);
+            Block block = editor->invalidated[i].block;
+            if (contains_block(block, region.block))
+                return;
+
+            if (contains_block(region.block, block))
+            {
+                if (i + 1 == editor->invalidated_length)
+                    editor->invalidated_length--;
+                else
+                    REMOVE_ELEMENT_UNORDERED(editor->invalidated, i);
+            }
+            else if (block.x == region.block.x && block.y + block.height == region.block.y)
+            {
+                editor->invalidated[i].block.height += region.block.height;
+                return;
+            }
         }
     }
 
@@ -38,6 +68,9 @@ void invalidate_region(Editor* editor, Region region)
 
 void invalidate_location(Editor* editor)
 {
+    // TODO: If the old location is given as an argument
+    // then we can invalidate the exact width.
+    
     // The widest location is 65536:65536.
     uint16_t widest_location = 11 * editor->font_width;
     invalidate_block(editor, (Block)

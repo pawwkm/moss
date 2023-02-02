@@ -33,3 +33,8 @@ bool is_empty_block(Block block)
 {
     return !block.width || !block.height;
 }
+
+bool is_scrolling_region(Region r)
+{
+    return r.scroll_x || r.scroll_y;
+}

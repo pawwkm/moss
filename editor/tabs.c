@@ -72,7 +72,7 @@ void measure_tabs(Editor* editor)
         for (uint8_t v = 0; v < tab->views_length; v++)
         {
             View* restrict view = &tab->views[v];
-            go_to(editor, view, tab_to_view_block(editor, tab->block), false, (Location)
+            go_to(editor, view, tab_to_view_block(editor, tab->block), (Location)
             {
                 .line = view->offset.line + view->cursor.line,
                 .column = view->offset.column + view->cursor.column
@@ -158,24 +158,6 @@ View* find_active_tab_view(const Tab* tab)
     return &tab->views[tab->active_view_index];
 }
 
-typedef enum
-{
-    Vertical_Movement_none,
-    Vertical_Movement_up,
-    Vertical_Movement_down
-} Vertical_Movement;
-
-// TODO: Detect needed movement when resizing tabs.
-static Vertical_Movement find_vertical_movement(const View* view, uint16_t absolute_line)
-{
-    if (view->offset.line + view->cursor.line < absolute_line)
-        return Vertical_Movement_down;
-    else if (view->offset.line + view->cursor.line > absolute_line)
-        return Vertical_Movement_up;
-    else
-        return Vertical_Movement_none;
-}
-
 static void center_on_line(Editor* editor, View* view, Block view_block, uint16_t absolute_line)
 {
     invalidate_block(editor, (Block)
@@ -238,10 +220,10 @@ static void go_up(Editor* editor, View* view, Block view_block, uint16_t absolut
 
 static void go_down(Editor* editor, View* view, Block view_block, uint16_t absolute_line)
 {
-    uint16_t line_to_go_down = absolute_line - (view->offset.line + view->cursor.line);
+    uint16_t lines_to_go_down = absolute_line - (view->offset.line + view->cursor.line);
     Buffer* buffer = lookup_buffer(view->buffer);
 
-    if (line_to_go_down == 1)
+    if (lines_to_go_down == 1)
     {
         if (view->offset.line + view->cursor.line + 1 == buffer->lines_length)
         {
@@ -264,14 +246,31 @@ static void go_down(Editor* editor, View* view, Block view_block, uint16_t absol
         }
         else if (view->cursor.line + editor->line_scroll_padding >= visible_lines_in_tabs(editor))
         {
-            //invalidate_block(editor, view_block);
             invalidate_region(editor, (Region)
             {
                 .scroll_x = 0,
                 .scroll_y = -editor->font_height,
                 .block = view_block
             });
-            
+
+            // Current cursor.
+            invalidate_block(editor, (Block)
+            {
+                .x = 0,
+                .y = (visible_lines_in_tabs(editor) - editor->line_scroll_padding + 1) * editor->font_height,
+                .width = editor->font_width,
+                .height = editor->font_height
+            });
+
+            // Next cursor.
+            invalidate_block(editor, (Block)
+            {
+                .x = 0,
+                .y = (visible_lines_in_tabs(editor) - editor->line_scroll_padding + 2) * editor->font_height,
+                .width = editor->font_width,
+                .height = editor->font_height
+            });
+
             view->offset.line++;
         }
         else
@@ -297,29 +296,12 @@ static void go_down(Editor* editor, View* view, Block view_block, uint16_t absol
             view->cursor.line -= lines_over_padding;
         }
         else
-            view->cursor.line += line_to_go_down;
+            view->cursor.line += lines_to_go_down;
 
         assert(false && "Invalidate view.");
     }
     else
         center_on_line(editor, view, view_block, absolute_line);
-}
-
-typedef enum
-{
-    Horizontal_Movement_none,
-    Horizontal_Movement_left,
-    Horizontal_Movement_right
-} Horizontal_Movement;
-
-static Horizontal_Movement find_horizontal_movement(View* view, uint16_t absolute_column)
-{
-    if (view->offset.column + view->cursor.column > absolute_column)
-        return Horizontal_Movement_left;
-    else if (view->offset.column + view->cursor.column < absolute_column)
-        return Horizontal_Movement_right;
-    else
-        return Horizontal_Movement_none;
 }
 
 static void center_on_column(View* view, uint16_t visible_columns, uint16_t absolute_column)
@@ -355,7 +337,7 @@ static void go_right(Editor* editor, View* view, Block view_block, uint16_t abso
     {
         view->offset.column = 0;
         view->cursor.column = absolute_column;
-        //assert(false && "Invalidate view.");
+        assert(false && "Invalidate view.");
     }
     else if (view->offset.column <= absolute_column && view->offset.column + visible_columns > absolute_column)
     {
@@ -366,75 +348,37 @@ static void go_right(Editor* editor, View* view, Block view_block, uint16_t abso
         center_on_column(view, visible_columns, absolute_column);
 }
 
-void go_to(Editor* editor, View* view, Block view_block, bool use_preferred_column, Location absolute_location)
+void go_to(Editor* editor, View* view, Block view_block, Location absolute)
 {
     Buffer* buffer = lookup_buffer(view->buffer);
-    if (buffer->lines_length < absolute_location.line)
-        absolute_location.line = buffer->lines_length - 1;
+    if (buffer->lines_length < absolute.line)
+        absolute.line = buffer->lines_length - 1;
 
-    Line* line = &buffer->lines[absolute_location.line];
-    if (line->characters_length < absolute_location.column)
-        absolute_location.column = line->characters_length;
+    Line* line = &buffer->lines[absolute.line];
+    if (line->characters_length < absolute.column)
+        absolute.column = line->characters_length;
 
-    Vertical_Movement vertical_movement = find_vertical_movement(view, absolute_location.line);
-    switch (vertical_movement)
-    {
-        case Vertical_Movement_none:
-            break;
+    if (view->offset.column + view->cursor.column != absolute.column)
+        absolute.column = line->characters_length < view->prefered_column ? line->characters_length : view->prefered_column;
 
-        case Vertical_Movement_up:
-            go_up(editor, view, view_block, absolute_location.line);
-            break;
-        
-        case Vertical_Movement_down:
-            go_down(editor, view, view_block, absolute_location.line);
-            break;
-    }
-
-    Horizontal_Movement horizontal_movement = Horizontal_Movement_none;
-    if (use_preferred_column)
-    {
-        if (vertical_movement)
-        {
-            uint16_t column = line->characters_length < view->prefered_column ? line->characters_length : view->prefered_column;
-            horizontal_movement = find_horizontal_movement(view, column);
-
-            switch (horizontal_movement)
-            {
-                case Horizontal_Movement_none:
-                    break;
-
-                case Horizontal_Movement_left:
-                    go_left(editor, view, view_block, column);
-                    break;
-
-                case Horizontal_Movement_right:
-                    go_right(editor, view, view_block, column);
-                    break;
-            }
-        }
-    }
+    bool v_move = true;
+    if (view->offset.line + view->cursor.line < absolute.line)
+        go_down(editor, view, view_block, absolute.line);
+    else if (view->offset.line + view->cursor.line > absolute.line)
+        go_up(editor, view, view_block, absolute.line);
     else
-    {
-        horizontal_movement = find_horizontal_movement(view, absolute_location.column);
-        switch (horizontal_movement)
-        {
-            case Horizontal_Movement_none:
-                break;
+        v_move = false;
 
-            case Horizontal_Movement_left:
-                go_left(editor, view, view_block, absolute_location.column);
-                break;
+    bool h_move = true;
+    if (view->offset.column + view->cursor.column > absolute.column)
+        go_left(editor, view, view_block, absolute.column);
+    else if (view->offset.column + view->cursor.column < absolute.column)
+        go_right(editor, view, view_block, absolute.column);
+    else
+        h_move = false;
 
-            case Horizontal_Movement_right:
-                go_right(editor, view, view_block, absolute_location.column);
-                break;
-        }
-
-        view->prefered_column = view->offset.column + view->cursor.column;
-    }
-
-    if (horizontal_movement || vertical_movement)
+    view->prefered_column = view->offset.column + view->cursor.column;
+    if (v_move || h_move)
         invalidate_location(editor);
 }
 
